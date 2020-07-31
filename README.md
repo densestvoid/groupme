@@ -6,6 +6,7 @@ I would like to add common helper functions/features inspired by the package use
 # GroupMe API Wrapper
 ![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/densestvoid/groupme?label=version&logo=version&sort=semver)
 [![PkgGoDev](https://pkg.go.dev/badge/github.com/densestvoid/groupme)](https://pkg.go.dev/github.com/densestvoid/groupme)
+[![codecov](https://codecov.io/gh/densestvoid/groupme/branch/master/graph/badge.svg)](https://codecov.io/gh/densestvoid/groupme)
 ## Description
 The design of this package is meant to be super simple. Wrap the exposed API endpoints [documented](https://dev.groupme.com/docs/v3#v3) by the GroupMe team. While you can achieve the core of this package with cURL, there are some small added features, coupled along with a modern language, that should simplify writing GroupMe [bots](https://dev.groupme.com/bots) and [applications](https://dev.groupme.com/applications).
 
