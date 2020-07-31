@@ -1,4 +1,4 @@
-name: Build and Test
+name: test
 on:
   push:
     tags:
@@ -20,7 +20,7 @@ jobs:
         uses: actions/checkout@v1
 
       - name: Run Unit tests.
-        run: go test -short -coverprofile cover.out -covermode=atomic ${PKG_LIST} && cat cover.out >> coverage.txt
+        run: go test -coverprofile cover.out -covermode=atomic ${PKG_LIST} && cat cover.out >> coverage.txt
 
       - name: Upload Coverage report to CodeCov
         uses: codecov/codecov-action@v1.0.0
