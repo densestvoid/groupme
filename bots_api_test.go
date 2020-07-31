@@ -51,7 +51,7 @@ func TestBotsAPISuite(t *testing.T) {
 }
 
 func botsTestRouter() *mux.Router {
-	router := mux.NewRouter()
+	router := mux.NewRouter().Queries("token", "").Subrouter()
 
 	// Create
 	router.Path("/bots").

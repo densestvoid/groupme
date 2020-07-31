@@ -29,7 +29,7 @@ func TestLikesAPISuite(t *testing.T) {
 	suite.Run(t, new(LikesAPISuite))
 }
 func likesTestRouter() *mux.Router {
-	router := mux.NewRouter()
+	router := mux.NewRouter().Queries("token", "").Subrouter()
 
 	// Create
 	router.Path(`/messages/{conversation_id}/{message_id}/like`).

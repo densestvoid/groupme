@@ -27,7 +27,7 @@ func TestSMSModeAPISuite(t *testing.T) {
 }
 
 func smsModeTestRouter() *mux.Router {
-	router := mux.NewRouter()
+	router := mux.NewRouter().Queries("token", "").Subrouter()
 
 	// Create
 	router.Path("/users/sms_mode").

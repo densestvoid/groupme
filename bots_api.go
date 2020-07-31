@@ -73,6 +73,7 @@ Parameters:
 	pictureURL - string; image must be processed through image
 				service (https://dev.groupme.com/docs/image_service)
 */
+// TODO: Move PostBotMessage to bot object, since it doesn't require access token
 func (c *Client) PostBotMessage(botID ID, text string, pictureURL *string) error {
 	URL := fmt.Sprintf(c.endpointBase + postBotMessageEndpoint)
 

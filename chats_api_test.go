@@ -35,7 +35,7 @@ func TestChatsAPISuite(t *testing.T) {
 }
 
 func chatsTestRouter() *mux.Router {
-	router := mux.NewRouter()
+	router := mux.NewRouter().Queries("token", "").Subrouter()
 
 	// Index
 	router.Path("/chats").

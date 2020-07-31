@@ -46,7 +46,7 @@ func TestBlocksAPISuite(t *testing.T) {
 }
 
 func blocksTestRouter() *mux.Router {
-	router := mux.NewRouter()
+	router := mux.NewRouter().Queries("token", "").Subrouter()
 
 	// Index
 	router.Path("/blocks").

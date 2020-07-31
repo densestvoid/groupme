@@ -48,7 +48,7 @@ func TestDirectMessagesAPISuite(t *testing.T) {
 }
 
 func directMessagesTestRouter() *mux.Router {
-	router := mux.NewRouter()
+	router := mux.NewRouter().Queries("token", "").Subrouter()
 
 	// Index
 	router.Path("/direct_messages").

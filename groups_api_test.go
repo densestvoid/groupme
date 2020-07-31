@@ -110,7 +110,7 @@ func TestGroupsAPISuite(t *testing.T) {
 ////////// Test Groups Router //////////
 
 func groupsTestRouter() *mux.Router {
-	router := mux.NewRouter()
+	router := mux.NewRouter().Queries("token", "").Subrouter()
 
 	// Index
 	router.Path("/groups").

@@ -48,7 +48,7 @@ func TestLeaderboardAPISuite(t *testing.T) {
 }
 
 func leaderboardTestRouter() *mux.Router {
-	router := mux.NewRouter()
+	router := mux.NewRouter().Queries("token", "").Subrouter()
 
 	// Index
 	router.Path("/groups/{id:[0-9]+}/likes").

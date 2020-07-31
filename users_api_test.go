@@ -32,7 +32,7 @@ func TestUsersAPISuite(t *testing.T) {
 	suite.Run(t, new(UsersAPISuite))
 }
 func usersTestRouter() *mux.Router {
-	router := mux.NewRouter()
+	router := mux.NewRouter().Queries("token", "").Subrouter()
 
 	// Me
 	router.Path("/users/me").

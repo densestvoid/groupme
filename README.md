@@ -4,6 +4,8 @@ I would like to add common helper functions/features inspired by the package use
 <br>
 
 # GroupMe API Wrapper
+![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/densestvoid/groupme?label=version&logo=version&sort=semver)
+[![PkgGoDev](https://pkg.go.dev/badge/github.com/densestvoid/groupme)](https://pkg.go.dev/github.com/densestvoid/groupme)
 ## Description
 The design of this package is meant to be super simple. Wrap the exposed API endpoints [documented](https://dev.groupme.com/docs/v3#v3) by the GroupMe team. While you can achieve the core of this package with cURL, there are some small added features, coupled along with a modern language, that should simplify writing GroupMe [bots](https://dev.groupme.com/bots) and [applications](https://dev.groupme.com/applications).
 
@@ -17,51 +19,50 @@ I enjoy programming, I use GroupMe with friends, and I wanted to write a fun add
 package main
 
 import (
-    "fmt"
+	"fmt"
 
-    "github.com/densestvoid/groupme"
+	"github.com/densestvoid/groupme"
 )
 
 // This is not a real token. Please find yours by logging
 // into the GroupMe development website: https://dev.groupme.com/
 const authorizationToken = "0123456789ABCDEF"
 
-
 // A short program that gets the gets the first 5 groups
 // the user is part of, and then the first 10 messages of
 // the first group in that list
 func main() {
-    // Create a new client with your auth token
-    client := groupme.NewClient(authorizationToken)
+	// Create a new client with your auth token
+	client := groupme.NewClient(authorizationToken)
 
-    // Get the groups your user is part of
-    groups, err := client.IndexGroups(&GroupsQuery{
-        Page: 0,
-        PerPage: 5,
-        Omit: "memberships",
-    })
+	// Get the groups your user is part of
+	groups, err := client.IndexGroups(&groupme.GroupsQuery{
+		Page:    0,
+		PerPage: 5,
+		Omit:    "memberships",
+	})
 
-    if err != nil {
-        fmt.Println(err)
-        return
-    }
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
-    fmt.Println(groups)
+	fmt.Println(groups)
 
-    // Get first 10 messages of the first group
-    if len(groups) <= 0 {
-        fmt.Println("No groups")
-    }
+	// Get first 10 messages of the first group
+	if len(groups) <= 0 {
+		fmt.Println("No groups")
+	}
 
-    messages, err := client.IndexMessages(groups[0].ID, &IndexMessagesQuery{
-        Limit: 10,
-    })
+	messages, err := client.IndexMessages(groups[0].ID, &groupme.IndexMessagesQuery{
+		Limit: 10,
+	})
 
-    if err != nil {
-        fmt.Println(err)
-    }
+	if err != nil {
+		fmt.Println(err)
+	}
 
-    fmt.Println(messages)
+	fmt.Println(messages)
 }
 ```
 

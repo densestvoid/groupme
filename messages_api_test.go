@@ -50,7 +50,7 @@ func TestMessagesAPISuite(t *testing.T) {
 }
 
 func messagesTestRouter() *mux.Router {
-	router := mux.NewRouter()
+	router := mux.NewRouter().Queries("token", "").Subrouter()
 
 	// Index
 	router.Path("/groups/{id:[0-9]+}/messages").
