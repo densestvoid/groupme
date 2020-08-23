@@ -83,7 +83,7 @@ func (c *Client) IndexDirectMessages(otherUserID ID, req *IndexDirectMessagesQue
 	}
 
 	var resp IndexDirectMessagesResponse
-	err = c.do(httpReq, &resp)
+	err = c.doWithAuthToken(httpReq, &resp)
 	if err != nil {
 		return IndexDirectMessagesResponse{}, err
 	}
@@ -136,7 +136,7 @@ func (c *Client) CreateDirectMessage(m *Message) (*Message, error) {
 	var resp struct {
 		*Message `json:"message"`
 	}
-	err = c.do(httpReq, &resp)
+	err = c.doWithAuthToken(httpReq, &resp)
 	if err != nil {
 		return nil, err
 	}

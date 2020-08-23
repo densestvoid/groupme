@@ -44,7 +44,7 @@ func (c *Client) IndexBlock(userID ID) ([]*Block, error) {
 	var resp struct {
 		Blocks []*Block `json:"blocks"`
 	}
-	err = c.do(httpReq, &resp)
+	err = c.doWithAuthToken(httpReq, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -77,7 +77,7 @@ func (c *Client) BlockBetween(userID, otherUserID ID) (bool, error) {
 	var resp struct {
 		Between bool `json:"between"`
 	}
-	err = c.do(httpReq, &resp)
+	err = c.doWithAuthToken(httpReq, &resp)
 	if err != nil {
 		return false, err
 	}
@@ -111,7 +111,7 @@ func (c *Client) CreateBlock(userID, otherUserID ID) (*Block, error) {
 	var resp struct {
 		Block *Block `json:"block"`
 	}
-	err = c.do(httpReq, &resp)
+	err = c.doWithAuthToken(httpReq, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -142,7 +142,7 @@ func (c *Client) Unblock(userID, otherUserID ID) error {
 	query.Set("otherUser", otherUserID.String())
 	URL.RawQuery = query.Encode()
 
-	err = c.do(httpReq, nil)
+	err = c.doWithAuthToken(httpReq, nil)
 	if err != nil {
 		return err
 	}

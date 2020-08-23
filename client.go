@@ -59,11 +59,6 @@ func (r response) UnmarshalJSON(bs []byte) error {
 }
 
 func (c Client) do(req *http.Request, i interface{}) error {
-	URL := req.URL
-	query := URL.Query()
-	query.Set("token", c.authorizationToken)
-	URL.RawQuery = query.Encode()
-
 	getResp, err := c.httpClient.Do(req)
 	if err != nil {
 		return err
@@ -94,4 +89,13 @@ func (c Client) do(req *http.Request, i interface{}) error {
 	}
 
 	return nil
+}
+
+func (c Client) doWithAuthToken(req *http.Request, i interface{}) error {
+	URL := req.URL
+	query := URL.Query()
+	query.Set("token", c.authorizationToken)
+	URL.RawQuery = query.Encode()
+
+	return c.do(req, i)
 }

@@ -51,10 +51,11 @@ func TestBotsAPISuite(t *testing.T) {
 }
 
 func botsTestRouter() *mux.Router {
-	router := mux.NewRouter().Queries("token", "").Subrouter()
+	router := mux.NewRouter()
+	authRouter := router.Queries("token", "").Subrouter()
 
 	// Create
-	router.Path("/bots").
+	authRouter.Path("/bots").
 		Methods("POST").
 		Name("CreateBot").
 		HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
@@ -84,7 +85,7 @@ func botsTestRouter() *mux.Router {
 		})
 
 	// Index
-	router.Path("/bots").
+	authRouter.Path("/bots").
 		Methods("GET").
 		Name("IndexBots").
 		HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
@@ -108,7 +109,7 @@ func botsTestRouter() *mux.Router {
 		})
 
 	// Destroy
-	router.Path("/bots/destroy").
+	authRouter.Path("/bots/destroy").
 		Methods("POST").
 		Name("DestroyBot").
 		HandlerFunc(func(w http.ResponseWriter, req *http.Request) {

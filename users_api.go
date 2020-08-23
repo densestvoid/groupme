@@ -39,7 +39,7 @@ func (c *Client) MyUser() (*User, error) {
 	}
 
 	var resp User
-	err = c.do(httpReq, &resp)
+	err = c.doWithAuthToken(httpReq, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -96,7 +96,7 @@ func (c *Client) UpdateMyUser(us UserSettings) (*User, error) {
 	httpReq.PostForm = data
 
 	var resp User
-	err = c.do(httpReq, &resp)
+	err = c.doWithAuthToken(httpReq, &resp)
 	if err != nil {
 		return nil, err
 	}

@@ -37,7 +37,7 @@ func (c *Client) CreateLike(conversationID, messageID ID) error {
 		return err
 	}
 
-	return c.do(httpReq, nil)
+	return c.doWithAuthToken(httpReq, nil)
 }
 
 // Destroy
@@ -59,5 +59,5 @@ func (c *Client) DestroyLike(conversationID, messageID ID) error {
 		return err
 	}
 
-	return c.do(httpReq, nil)
+	return c.doWithAuthToken(httpReq, nil)
 }

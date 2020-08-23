@@ -52,7 +52,7 @@ func (c *Client) IndexChats(req *IndexChatsQuery) ([]*Chat, error) {
 	URL.RawQuery = query.Encode()
 
 	var resp []*Chat
-	err = c.do(httpReq, &resp)
+	err = c.doWithAuthToken(httpReq, &resp)
 	if err != nil {
 		return nil, err
 	}

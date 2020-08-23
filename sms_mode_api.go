@@ -50,7 +50,7 @@ func (c *Client) CreateSMSMode(duration int, registrationID *ID) error {
 
 	httpReq.PostForm = data
 
-	err = c.do(httpReq, nil)
+	err = c.doWithAuthToken(httpReq, nil)
 	if err != nil {
 		return err
 	}
@@ -73,5 +73,5 @@ func (c *Client) DeleteSMSMode() error {
 		return err
 	}
 
-	return c.do(httpReq, nil)
+	return c.doWithAuthToken(httpReq, nil)
 }

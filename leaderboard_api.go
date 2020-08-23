@@ -60,7 +60,7 @@ func (c *Client) IndexLeaderboard(groupID ID, p period) ([]*Message, error) {
 	var resp struct {
 		Messages []*Message `json:"messages"`
 	}
-	err = c.do(httpReq, &resp)
+	err = c.doWithAuthToken(httpReq, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -90,7 +90,7 @@ func (c *Client) MyLikesLeaderboard(groupID ID) ([]*Message, error) {
 	var resp struct {
 		Messages []*Message `json:"messages"`
 	}
-	err = c.do(httpReq, &resp)
+	err = c.doWithAuthToken(httpReq, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -120,7 +120,7 @@ func (c *Client) MyHitsLeaderboard(groupID ID) ([]*Message, error) {
 	var resp struct {
 		Messages []*Message `json:"messages"`
 	}
-	err = c.do(httpReq, &resp)
+	err = c.doWithAuthToken(httpReq, &resp)
 	if err != nil {
 		return nil, err
 	}

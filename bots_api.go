@@ -52,7 +52,7 @@ func (c *Client) CreateBot(bot *Bot) (*Bot, error) {
 	httpReq.PostForm = data
 
 	var resp Bot
-	err = c.do(httpReq, &resp)
+	err = c.doWithAuthToken(httpReq, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -108,7 +108,7 @@ func (c *Client) IndexBots() ([]*Bot, error) {
 	}
 
 	var resp []*Bot
-	err = c.do(httpReq, &resp)
+	err = c.doWithAuthToken(httpReq, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -139,5 +139,5 @@ func (c *Client) DestroyBot(botID ID) error {
 
 	httpReq.PostForm = data
 
-	return c.do(httpReq, nil)
+	return c.doWithAuthToken(httpReq, nil)
 }

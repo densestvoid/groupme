@@ -105,7 +105,7 @@ func (c *Client) IndexGroups(req *GroupsQuery) ([]*Group, error) {
 	URL.RawQuery = query.Encode()
 
 	var resp []*Group
-	err = c.do(httpReq, &resp)
+	err = c.doWithAuthToken(httpReq, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -127,7 +127,7 @@ func (c *Client) FormerGroups() ([]*Group, error) {
 	}
 
 	var resp []*Group
-	err = c.do(httpReq, &resp)
+	err = c.doWithAuthToken(httpReq, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -154,7 +154,7 @@ func (c *Client) ShowGroup(groupID ID) (*Group, error) {
 	}
 
 	var resp Group
-	err = c.do(httpReq, &resp)
+	err = c.doWithAuthToken(httpReq, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -195,7 +195,7 @@ func (c *Client) CreateGroup(gs GroupSettings) (*Group, error) {
 	httpReq.PostForm = data
 
 	var resp Group
-	err = c.do(httpReq, &resp)
+	err = c.doWithAuthToken(httpReq, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -241,7 +241,7 @@ func (c *Client) UpdateGroup(groupID ID, gs GroupSettings) (*Group, error) {
 	httpReq.PostForm = data
 
 	var resp Group
-	err = c.do(httpReq, &resp)
+	err = c.doWithAuthToken(httpReq, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -269,7 +269,7 @@ func (c *Client) DestroyGroup(groupID ID) error {
 		return err
 	}
 
-	return c.do(httpReq, nil)
+	return c.doWithAuthToken(httpReq, nil)
 }
 
 ///// Join /////
@@ -292,7 +292,7 @@ func (c *Client) JoinGroup(groupID ID, shareToken string) (*Group, error) {
 	}
 
 	var resp Group
-	err = c.do(httpReq, &resp)
+	err = c.doWithAuthToken(httpReq, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -321,7 +321,7 @@ func (c *Client) RejoinGroup(groupID ID) (*Group, error) {
 	httpReq.PostForm = data
 
 	var resp Group
-	err = c.do(httpReq, &resp)
+	err = c.doWithAuthToken(httpReq, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -357,7 +357,7 @@ func (c *Client) ChangeGroupOwner(reqs ChangeOwnerRequest) (ChangeOwnerResult, e
 		Results []ChangeOwnerResult `json:"results"`
 	}
 
-	err = c.do(httpReq, &resp)
+	err = c.doWithAuthToken(httpReq, &resp)
 	if err != nil {
 		return ChangeOwnerResult{}, err
 	}

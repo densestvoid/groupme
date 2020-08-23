@@ -66,7 +66,7 @@ func (c *Client) AddMembers(groupID ID, members ...*Member) (string, error) {
 		ResultsID string `json:"result_id"`
 	}
 
-	err = c.do(httpReq, &resp)
+	err = c.doWithAuthToken(httpReq, &resp)
 	if err != nil {
 		return "", err
 	}
@@ -104,7 +104,7 @@ func (c *Client) AddMembersResults(groupID ID, resultID string) ([]*Member, erro
 		Members []*Member `json:"members"`
 	}
 
-	err = c.do(httpReq, &resp)
+	err = c.doWithAuthToken(httpReq, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -133,7 +133,7 @@ func (c *Client) RemoveMember(groupID, membershipID ID) error {
 		return err
 	}
 
-	return c.do(httpReq, nil)
+	return c.doWithAuthToken(httpReq, nil)
 }
 
 ///// Update /////
@@ -165,7 +165,7 @@ func (c *Client) UpdateMember(groupID ID, nickname string) (*Member, error) {
 
 	var resp Member
 
-	err = c.do(httpReq, &resp)
+	err = c.doWithAuthToken(httpReq, &resp)
 	if err != nil {
 		return nil, err
 	}

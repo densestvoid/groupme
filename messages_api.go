@@ -110,7 +110,7 @@ func (c *Client) IndexMessages(groupID ID, req *IndexMessagesQuery) (IndexMessag
 	URL.RawQuery = query.Encode()
 
 	var resp IndexMessagesResponse
-	err = c.do(httpReq, &resp)
+	err = c.doWithAuthToken(httpReq, &resp)
 	if err != nil {
 		return IndexMessagesResponse{}, err
 	}
@@ -165,7 +165,7 @@ func (c *Client) CreateMessage(groupID ID, m *Message) (*Message, error) {
 	var resp struct {
 		*Message `json:"message"`
 	}
-	err = c.do(httpReq, &resp)
+	err = c.doWithAuthToken(httpReq, &resp)
 	if err != nil {
 		return nil, err
 	}
