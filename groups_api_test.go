@@ -56,14 +56,6 @@ func (s *GroupsAPISuite) TestGroupsCreate() {
 	s.Assert().NotZero(group)
 }
 
-func (s *GroupsAPISuite) TestGroupsCreate_EmptyName() {
-	group, err := s.client.CreateGroup(GroupSettings{
-		Name: "",
-	})
-	s.Require().Error(err)
-	s.Assert().Zero(group)
-}
-
 func (s *GroupsAPISuite) TestGroupsUpdate() {
 	group, err := s.client.UpdateGroup("1", GroupSettings{
 		"Test",

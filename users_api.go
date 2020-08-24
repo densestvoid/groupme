@@ -1,9 +1,10 @@
 package groupme
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"net/http"
-	"net/url"
 )
 
 // GroupMe documentation: https://dev.groupme.com/docs/v3#users
@@ -70,30 +71,15 @@ Parameters: See UserSettings
 func (c *Client) UpdateMyUser(us UserSettings) (*User, error) {
 	URL := fmt.Sprintf(c.endpointBase + updateMyUserEndpoint)
 
-	httpReq, err := http.NewRequest("POST", URL, nil)
+	jsonBytes, err := json.Marshal(&us)
 	if err != nil {
 		return nil, err
 	}
 
-	data := url.Values{}
-
-	if us.AvatarURL != "" {
-		data.Add("avatar_url", us.AvatarURL)
+	httpReq, err := http.NewRequest("POST", URL, bytes.NewBuffer(jsonBytes))
+	if err != nil {
+		return nil, err
 	}
-
-	if us.Name != "" {
-		data.Add("name", us.Name)
-	}
-
-	if us.Email != "" {
-		data.Add("email", us.Email)
-	}
-
-	if us.ZipCode != "" {
-		data.Add("zip_code", us.ZipCode)
-	}
-
-	httpReq.PostForm = data
 
 	var resp User
 	err = c.doWithAuthToken(httpReq, &resp)

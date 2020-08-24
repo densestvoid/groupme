@@ -1,10 +1,10 @@
 package groupme
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"net/url"
 )
 
 // GroupMe documentation: https://dev.groupme.com/docs/v3#members
@@ -49,18 +49,21 @@ Parameters:
 func (c *Client) AddMembers(groupID ID, members ...*Member) (string, error) {
 	URL := fmt.Sprintf(c.endpointBase+addMembersEndpoint, groupID)
 
-	httpReq, err := http.NewRequest("POST", URL, nil)
+	var data = struct {
+		Members []*Member `json:"members"`
+	}{
+		members,
+	}
+
+	jsonBytes, err := json.Marshal(&data)
 	if err != nil {
 		return "", err
 	}
 
-	data := url.Values{}
-	bytes, err := json.Marshal(members)
+	httpReq, err := http.NewRequest("POST", URL, bytes.NewBuffer(jsonBytes))
 	if err != nil {
 		return "", err
 	}
-	data.Set("members", string(bytes))
-	httpReq.PostForm = data
 
 	var resp struct {
 		ResultsID string `json:"result_id"`
@@ -147,21 +150,24 @@ between 1 and 50 characters.
 func (c *Client) UpdateMember(groupID ID, nickname string) (*Member, error) {
 	URL := fmt.Sprintf(c.endpointBase+updateMemberEndpoint, groupID)
 
-	httpReq, err := http.NewRequest("POST", URL, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	type membership struct {
+	type Nickname struct {
 		Nickname string `json:"nickname"`
 	}
+	var data = struct {
+		Membership Nickname `json:"membership"`
+	}{
+		Nickname{nickname},
+	}
 
-	data := url.Values{}
-	bytes, err := json.Marshal(membership{nickname})
+	jsonBytes, err := json.Marshal(&data)
 	if err != nil {
 		return nil, err
 	}
-	data.Add("membership", string(bytes))
+
+	httpReq, err := http.NewRequest("POST", URL, bytes.NewBuffer(jsonBytes))
+	if err != nil {
+		return nil, err
+	}
 
 	var resp Member
 

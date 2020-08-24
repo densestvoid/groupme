@@ -1,10 +1,10 @@
 package groupme
 
 import (
-	"errors"
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"net/http"
-	"net/url"
 )
 
 // GroupMe documentation: https://dev.groupme.com/docs/v3#bots
@@ -37,19 +37,23 @@ Parameters:
 	GroupID - required
 */
 func (c *Client) CreateBot(bot *Bot) (*Bot, error) {
-	httpReq, err := http.NewRequest("POST", c.endpointBase+createBotEndpoint, nil)
+	URL := c.endpointBase + createBotEndpoint
+
+	var data = struct {
+		Bot *Bot `json:"bot,omitempty"`
+	}{
+		bot,
+	}
+
+	jsonBytes, err := json.Marshal(&data)
 	if err != nil {
 		return nil, err
 	}
 
-	if bot == nil {
-		return nil, errors.New("bot cannot be nil")
+	httpReq, err := http.NewRequest("POST", URL, bytes.NewBuffer(jsonBytes))
+	if err != nil {
+		return nil, err
 	}
-
-	data := url.Values{}
-	data.Add("bot", bot.String())
-
-	httpReq.PostForm = data
 
 	var resp Bot
 	err = c.doWithAuthToken(httpReq, &resp)
@@ -77,19 +81,25 @@ Parameters:
 func (c *Client) PostBotMessage(botID ID, text string, pictureURL *string) error {
 	URL := fmt.Sprintf(c.endpointBase + postBotMessageEndpoint)
 
-	httpReq, err := http.NewRequest("POST", URL, nil)
+	var data = struct {
+		BotID      ID      `json:"bot_id"`
+		Text       string  `json:"text"`
+		PictureURL *string `json:",omitempty"`
+	}{
+		botID,
+		text,
+		pictureURL,
+	}
+
+	jsonBytes, err := json.Marshal(&data)
 	if err != nil {
 		return err
 	}
 
-	data := url.Values{}
-	data.Add("bot_id", string(botID))
-	data.Add("text", text)
-	if pictureURL != nil {
-		data.Add("picture_url", *pictureURL)
+	httpReq, err := http.NewRequest("POST", URL, bytes.NewBuffer(jsonBytes))
+	if err != nil {
+		return err
 	}
-
-	httpReq.PostForm = data
 
 	return c.do(httpReq, nil)
 }
@@ -129,15 +139,21 @@ Parameters:
 func (c *Client) DestroyBot(botID ID) error {
 	URL := fmt.Sprintf(c.endpointBase + destroyBotEndpoint)
 
-	httpReq, err := http.NewRequest("POST", URL, nil)
+	var data = struct {
+		BotID ID `json:"bot_id"`
+	}{
+		botID,
+	}
+
+	jsonBytes, err := json.Marshal(&data)
 	if err != nil {
 		return err
 	}
 
-	data := url.Values{}
-	data.Add("bot_id", string(botID))
-
-	httpReq.PostForm = data
+	httpReq, err := http.NewRequest("POST", URL, bytes.NewBuffer(jsonBytes))
+	if err != nil {
+		return err
+	}
 
 	return c.doWithAuthToken(httpReq, nil)
 }

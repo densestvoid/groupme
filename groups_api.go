@@ -1,10 +1,11 @@
 package groupme
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
-	"net/url"
 	"strconv"
 )
 
@@ -172,27 +173,17 @@ Create a new group
 Parameters: See GroupSettings
 */
 func (c *Client) CreateGroup(gs GroupSettings) (*Group, error) {
-	httpReq, err := http.NewRequest("POST", c.endpointBase+createGroupEndpoint, nil)
+	URL := fmt.Sprintf(c.endpointBase + createGroupEndpoint)
+
+	jsonBytes, err := json.Marshal(&gs)
 	if err != nil {
 		return nil, err
 	}
 
-	data := url.Values{}
-	if gs.Name == "" {
-		return nil, fmt.Errorf("GroupsCreateRequest Name field is required")
+	httpReq, err := http.NewRequest("POST", URL, bytes.NewBuffer(jsonBytes))
+	if err != nil {
+		return nil, err
 	}
-	data.Set("name", gs.Name)
-
-	if gs.Description != "" {
-		data.Set("description", gs.Description)
-	}
-	if gs.ImageURL != "" {
-		data.Set("image_url", gs.ImageURL)
-	}
-	if gs.Share {
-		data.Set("share", "true")
-	}
-	httpReq.PostForm = data
 
 	var resp Group
 	err = c.doWithAuthToken(httpReq, &resp)
@@ -217,28 +208,15 @@ Parameters:
 func (c *Client) UpdateGroup(groupID ID, gs GroupSettings) (*Group, error) {
 	URL := fmt.Sprintf(c.endpointBase+updateGroupEndpoint, groupID)
 
-	httpReq, err := http.NewRequest("POST", URL, nil)
+	jsonBytes, err := json.Marshal(&gs)
 	if err != nil {
 		return nil, err
 	}
 
-	data := url.Values{}
-	if gs.Name != "" {
-		data.Set("name", gs.Name)
+	httpReq, err := http.NewRequest("POST", URL, bytes.NewBuffer(jsonBytes))
+	if err != nil {
+		return nil, err
 	}
-	if gs.Description != "" {
-		data.Set("description", gs.Description)
-	}
-	if gs.ImageURL != "" {
-		data.Set("image_url", gs.ImageURL)
-	}
-	if gs.OfficeMode {
-		data.Set("office_mode", "true")
-	}
-	if gs.Share {
-		data.Set("share", "true")
-	}
-	httpReq.PostForm = data
 
 	var resp Group
 	err = c.doWithAuthToken(httpReq, &resp)
@@ -311,14 +289,23 @@ Parameters:
 	groupID - required, ID(string)
 */
 func (c *Client) RejoinGroup(groupID ID) (*Group, error) {
-	httpReq, err := http.NewRequest("POST", c.endpointBase+rejoinGroupEndpoint, nil)
+	URL := fmt.Sprintf(c.endpointBase + rejoinGroupEndpoint)
+
+	var data = struct {
+		GroupID ID `json:"group_id"`
+	}{
+		groupID,
+	}
+
+	jsonBytes, err := json.Marshal(&data)
 	if err != nil {
 		return nil, err
 	}
 
-	data := url.Values{}
-	data.Set("group_id", string(groupID))
-	httpReq.PostForm = data
+	httpReq, err := http.NewRequest("POST", URL, bytes.NewBuffer(jsonBytes))
+	if err != nil {
+		return nil, err
+	}
 
 	var resp Group
 	err = c.doWithAuthToken(httpReq, &resp)
@@ -344,14 +331,23 @@ the result of change owner action for the request
 Parameters: See ChangeOwnerRequest
 */
 func (c *Client) ChangeGroupOwner(reqs ChangeOwnerRequest) (ChangeOwnerResult, error) {
-	httpReq, err := http.NewRequest("POST", c.endpointBase+changeGroupOwnerEndpoint, nil)
+	URL := fmt.Sprintf(c.endpointBase + changeGroupOwnerEndpoint)
+
+	var data = struct {
+		Requests []ChangeOwnerRequest `json:"requests"`
+	}{
+		[]ChangeOwnerRequest{reqs},
+	}
+
+	jsonBytes, err := json.Marshal(&data)
 	if err != nil {
 		return ChangeOwnerResult{}, err
 	}
 
-	data := url.Values{}
-	data.Set("requests", marshal([]ChangeOwnerRequest{reqs}))
-	httpReq.PostForm = data
+	httpReq, err := http.NewRequest("POST", URL, bytes.NewBuffer(jsonBytes))
+	if err != nil {
+		return ChangeOwnerResult{}, err
+	}
 
 	var resp struct {
 		Results []ChangeOwnerResult `json:"results"`

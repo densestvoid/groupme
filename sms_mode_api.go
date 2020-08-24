@@ -1,10 +1,10 @@
 package groupme
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"net/http"
-	"net/url"
-	"strconv"
 )
 
 // GroupMe documentation: https://dev.groupme.com/docs/v3#sms_mode
@@ -36,19 +36,25 @@ Parameters:
 		delivered to the device.
 */
 func (c *Client) CreateSMSMode(duration int, registrationID *ID) error {
-	httpReq, err := http.NewRequest("POST", c.endpointBase+createSMSModeEndpoint, nil)
+	URL := fmt.Sprintf(c.endpointBase + createSMSModeEndpoint)
+
+	var data = struct {
+		Duration       int `json:"duration"`
+		RegistrationID *ID `json:"registration_id,omitempty"`
+	}{
+		duration,
+		registrationID,
+	}
+
+	jsonBytes, err := json.Marshal(&data)
 	if err != nil {
 		return err
 	}
 
-	data := url.Values{}
-	data.Add("duration", strconv.Itoa(duration))
-
-	if registrationID != nil {
-		data.Add("registration_id", registrationID.String())
+	httpReq, err := http.NewRequest("POST", URL, bytes.NewBuffer(jsonBytes))
+	if err != nil {
+		return err
 	}
-
-	httpReq.PostForm = data
 
 	err = c.doWithAuthToken(httpReq, nil)
 	if err != nil {

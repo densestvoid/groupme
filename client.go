@@ -3,7 +3,7 @@ package groupme
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 )
@@ -23,7 +23,8 @@ type Client struct {
 // NewClient creates a new GroupMe API Client
 func NewClient(authToken string) *Client {
 	return &Client{
-		httpClient:         new(http.Client),
+		// TODO: enable transport information passing in
+		httpClient:         &http.Client{},
 		endpointBase:       GroupMeAPIBase,
 		authorizationToken: authToken,
 	}
@@ -63,15 +64,16 @@ func (c Client) do(req *http.Request, i interface{}) error {
 	if err != nil {
 		return err
 	}
-
-	// Check Status Code is 1XX or 2XX
-	if getResp.StatusCode/100 > 2 {
-		return errors.New(getResp.Status)
-	}
+	defer getResp.Body.Close()
 
 	bytes, err := ioutil.ReadAll(getResp.Body)
 	if err != nil {
 		return err
+	}
+
+	// Check Status Code is 1XX or 2XX
+	if getResp.StatusCode/100 > 2 {
+		return fmt.Errorf("%s: %s", getResp.Status, string(bytes))
 	}
 
 	if i == nil {

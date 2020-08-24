@@ -1,9 +1,10 @@
 package groupme
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"net/http"
-	"net/url"
 	"strconv"
 
 	"github.com/google/uuid"
@@ -150,17 +151,23 @@ Parameters:
 */
 func (c *Client) CreateMessage(groupID ID, m *Message) (*Message, error) {
 	URL := fmt.Sprintf(c.endpointBase+createMessagesEndpoint, groupID)
-	httpReq, err := http.NewRequest("POST", URL, nil)
+
+	m.SourceGUID = uuid.New().String()
+	var data = struct {
+		Message *Message `json:"message"`
+	}{
+		m,
+	}
+
+	jsonBytes, err := json.Marshal(&data)
 	if err != nil {
 		return nil, err
 	}
 
-	m.SourceGUID = uuid.New().String()
-
-	data := url.Values{}
-	data.Set("message", m.String())
-
-	httpReq.PostForm = data
+	httpReq, err := http.NewRequest("POST", URL, bytes.NewBuffer(jsonBytes))
+	if err != nil {
+		return nil, err
+	}
 
 	var resp struct {
 		*Message `json:"message"`
