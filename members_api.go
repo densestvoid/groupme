@@ -66,7 +66,7 @@ func (c *Client) AddMembers(groupID ID, members ...*Member) (string, error) {
 	}
 
 	var resp struct {
-		ResultsID string `json:"result_id"`
+		ResultsID string `json:"results_id"`
 	}
 
 	err = c.doWithAuthToken(httpReq, &resp)

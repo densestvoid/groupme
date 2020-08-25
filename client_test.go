@@ -30,6 +30,14 @@ func (s *ClientSuite) TestClient_Close() {
 	s.Assert().NoError(s.client.Close())
 }
 
+func (s *ClientSuite) TestClient_do_PostContentType() {
+	req, err := http.NewRequest("POST", "", nil)
+	s.Require().NoError(err)
+
+	s.Assert().Error(s.client.do(req, struct{}{}))
+	s.Assert().EqualValues(req.Header.Get("Content-Type"), "application/json")
+}
+
 func (s *ClientSuite) TestClient_do_DoError() {
 	req, err := http.NewRequest("", "", nil)
 	s.Require().NoError(err)

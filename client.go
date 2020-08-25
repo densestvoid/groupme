@@ -60,6 +60,10 @@ func (r response) UnmarshalJSON(bs []byte) error {
 }
 
 func (c Client) do(req *http.Request, i interface{}) error {
+	if req.Method == "POST" {
+		req.Header.Set("Content-Type", "application/json")
+	}
+
 	getResp, err := c.httpClient.Do(req)
 	if err != nil {
 		return err
