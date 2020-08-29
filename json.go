@@ -8,8 +8,8 @@ import (
 // Meta is the error type returned in the GroupMe response.
 // Meant for clients that can't read HTTP status codes
 type Meta struct {
-	Code   HTTPStatusCode `json:"code"`
-	Errors []string       `json:"errors"`
+	Code   HTTPStatusCode `json:"code,omitempty"`
+	Errors []string       `json:"errors,omitempty"`
 }
 
 // Error returns the code and the error list as a string.
@@ -20,35 +20,35 @@ func (m Meta) Error() string {
 
 // Group is a GroupMe group, returned in JSON API responses
 type Group struct {
-	ID   ID     `json:"id"`
-	Name string `json:"name"`
+	ID   ID     `json:"id,omitempty"`
+	Name string `json:"name,omitempty"`
 	// Type of group (private|public)
-	Type          string        `json:"type"`
-	Description   string        `json:"description"`
-	ImageURL      string        `json:"image_url"`
-	CreatorUserID ID            `json:"creator_user_id"`
-	CreatedAt     Timestamp     `json:"created_at"`
-	UpdatedAt     Timestamp     `json:"updated_at"`
-	Members       []*Member     `json:"members"`
-	ShareURL      string        `json:"share_url"`
-	Messages      GroupMessages `json:"messages"`
+	Type          string        `json:"type,omitempty"`
+	Description   string        `json:"description,omitempty"`
+	ImageURL      string        `json:"image_url,omitempty"`
+	CreatorUserID ID            `json:"creator_user_id,omitempty"`
+	CreatedAt     Timestamp     `json:"created_at,omitempty"`
+	UpdatedAt     Timestamp     `json:"updated_at,omitempty"`
+	Members       []*Member     `json:"members,omitempty"`
+	ShareURL      string        `json:"share_url,omitempty"`
+	Messages      GroupMessages `json:"messages,omitempty"`
 }
 
 // GroupMessages is a Group field, only returned in Group JSON API responses
 type GroupMessages struct {
-	Count                uint           `json:"count"`
-	LastMessageID        ID             `json:"last_message_id"`
-	LastMessageCreatedAt Timestamp      `json:"last_message_created_at"`
-	Preview              MessagePreview `json:"preview"`
+	Count                uint           `json:"count,omitempty"`
+	LastMessageID        ID             `json:"last_message_id,omitempty"`
+	LastMessageCreatedAt Timestamp      `json:"last_message_created_at,omitempty"`
+	Preview              MessagePreview `json:"preview,omitempty"`
 }
 
 // MessagePreview is a GroupMessages field, only returned in Group JSON API responses.
 // Abbreviated form of Message type
 type MessagePreview struct {
-	Nickname    string        `json:"nickname"`
-	Text        string        `json:"text"`
-	ImageURL    string        `json:"image_url"`
-	Attachments []*Attachment `json:"attachments"`
+	Nickname    string        `json:"nickname,omitempty"`
+	Text        string        `json:"text,omitempty"`
+	ImageURL    string        `json:"image_url,omitempty"`
+	Attachments []*Attachment `json:"attachments,omitempty"`
 }
 
 // GetMemberByUserID gets the group member by their UserID,
@@ -81,14 +81,14 @@ func (g Group) String() string {
 
 // Member is a GroupMe group member, returned in JSON API responses
 type Member struct {
-	ID           ID     `json:"id"`
-	UserID       ID     `json:"user_id"`
-	Nickname     string `json:"nickname"`
-	Muted        bool   `json:"muted"`
-	ImageURL     string `json:"image_url"`
-	AutoKicked   bool   `json:"autokicked"`
-	AppInstalled bool   `json:"app_installed"`
-	GUID         string `json:"guid"`
+	ID           ID     `json:"id,omitempty"`
+	UserID       ID     `json:"user_id,omitempty"`
+	Nickname     string `json:"nickname,omitempty"`
+	Muted        bool   `json:"muted,omitempty"`
+	ImageURL     string `json:"image_url,omitempty"`
+	AutoKicked   bool   `json:"autokicked,omitempty"`
+	AppInstalled bool   `json:"app_installed,omitempty"`
+	GUID         string `json:"guid,omitempty"`
 }
 
 func (m Member) String() string {
@@ -97,25 +97,25 @@ func (m Member) String() string {
 
 // Message is a GroupMe group message, returned in JSON API responses
 type Message struct {
-	ID             ID         `json:"id"`
-	SourceGUID     string     `json:"source_guid"`
-	CreatedAt      Timestamp  `json:"created_at"`
-	GroupID        ID         `json:"group_id"`
-	UserID         ID         `json:"user_id"`
-	BotID          ID         `json:"bot_id"`
-	SenderID       ID         `json:"sender_id"`
-	SenderType     SenderType `json:"sender_type"`
-	System         bool       `json:"system"`
-	Name           string     `json:"name"`
-	RecipientID    ID         `json:"recipient_id"`
-	ConversationID ID         `json:"conversation_id"`
-	AvatarURL      string     `json:"avatar_url"`
+	ID             ID         `json:"id,omitempty"`
+	SourceGUID     string     `json:"source_guid,omitempty"`
+	CreatedAt      Timestamp  `json:"created_at,omitempty"`
+	GroupID        ID         `json:"group_id,omitempty"`
+	UserID         ID         `json:"user_id,omitempty"`
+	BotID          ID         `json:"bot_id,omitempty"`
+	SenderID       ID         `json:"sender_id,omitempty"`
+	SenderType     SenderType `json:"sender_type,omitempty"`
+	System         bool       `json:"system,omitempty"`
+	Name           string     `json:"name,omitempty"`
+	RecipientID    ID         `json:"recipient_id,omitempty"`
+	ConversationID ID         `json:"conversation_id,omitempty"`
+	AvatarURL      string     `json:"avatar_url,omitempty"`
 	// Maximum length of 1000 characters
-	Text string `json:"text"`
+	Text string `json:"text,omitempty"`
 	// Must be an image service URL (i.groupme.com)
-	ImageURL    string        `json:"image_url"`
-	FavoritedBy []string      `json:"favorited_by"`
-	Attachments []*Attachment `json:"attachments"`
+	ImageURL    string        `json:"image_url,omitempty"`
+	FavoritedBy []string      `json:"favorited_by,omitempty"`
+	Attachments []*Attachment `json:"attachments,omitempty"`
 }
 
 func (m Message) String() string {
@@ -143,15 +143,15 @@ const (
 
 // Attachment is a GroupMe message attachment, returned in JSON API responses
 type Attachment struct {
-	Type        AttachmentType `json:"type"`
-	Loci        [][]int        `json:"loci"`
-	UserIDs     []ID           `json:"user_ids"`
-	URL         string         `json:"url"`
-	Name        string         `json:"name"`
-	Latitude    string         `json:"lat"`
-	Longitude   string         `json:"lng"`
-	Placeholder string         `json:"placeholder"`
-	Charmap     [][]int        `json:"charmap"`
+	Type        AttachmentType `json:"type,omitempty"`
+	Loci        [][]int        `json:"loci,omitempty"`
+	UserIDs     []ID           `json:"user_ids,omitempty"`
+	URL         string         `json:"url,omitempty"`
+	Name        string         `json:"name,omitempty"`
+	Latitude    string         `json:"lat,omitempty"`
+	Longitude   string         `json:"lng,omitempty"`
+	Placeholder string         `json:"placeholder,omitempty"`
+	Charmap     [][]int        `json:"charmap,omitempty"`
 }
 
 func (a Attachment) String() string {
@@ -160,15 +160,15 @@ func (a Attachment) String() string {
 
 // User is a GroupMe user, returned in JSON API responses
 type User struct {
-	ID          ID          `json:"id"`
-	PhoneNumber PhoneNumber `json:"phone_number"`
-	ImageURL    string      `json:"image_url"`
-	Name        string      `json:"name"`
-	CreatedAt   Timestamp   `json:"created_at"`
-	UpdatedAt   Timestamp   `json:"updated_at"`
-	AvatarURL   string      `json:"avatar_url"`
-	Email       string      `json:"email"`
-	SMS         bool        `json:"sms"`
+	ID          ID          `json:"id,omitempty"`
+	PhoneNumber PhoneNumber `json:"phone_number,omitempty"`
+	ImageURL    string      `json:"image_url,omitempty"`
+	Name        string      `json:"name,omitempty"`
+	CreatedAt   Timestamp   `json:"created_at,omitempty"`
+	UpdatedAt   Timestamp   `json:"updated_at,omitempty"`
+	AvatarURL   string      `json:"avatar_url,omitempty"`
+	Email       string      `json:"email,omitempty"`
+	SMS         bool        `json:"sms,omitempty"`
 }
 
 func (u User) String() string {
@@ -178,11 +178,11 @@ func (u User) String() string {
 // Chat is a GroupMe direct message conversation between two users,
 // returned in JSON API responses
 type Chat struct {
-	CreatedAt     Timestamp `json:"created_at"`
-	UpdatedAt     Timestamp `json:"updated_at"`
-	LastMessage   *Message  `json:"last_message"`
-	MessagesCount int       `json:"messages_count"`
-	OtherUser     User      `json:"other_user"`
+	CreatedAt     Timestamp `json:"created_at,omitempty"`
+	UpdatedAt     Timestamp `json:"updated_at,omitempty"`
+	LastMessage   *Message  `json:"last_message,omitempty"`
+	MessagesCount int       `json:"messages_count,omitempty"`
+	OtherUser     User      `json:"other_user,omitempty"`
 }
 
 func (c Chat) String() string {
@@ -190,12 +190,12 @@ func (c Chat) String() string {
 }
 
 type Bot struct {
-	BotID          ID     `json:"bot_id"`
-	GroupID        ID     `json:"group_id"`
-	Name           string `json:"name"`
-	AvatarURL      string `json:"avatar_url"`
-	CallbackURL    string `json:"callback_url"`
-	DMNotification bool   `json:"dm_notification"`
+	BotID          ID     `json:"bot_id,omitempty"`
+	GroupID        ID     `json:"group_id,omitempty"`
+	Name           string `json:"name,omitempty"`
+	AvatarURL      string `json:"avatar_url,omitempty"`
+	CallbackURL    string `json:"callback_url,omitempty"`
+	DMNotification bool   `json:"dm_notification,omitempty"`
 }
 
 func (b Bot) String() string {
@@ -203,9 +203,9 @@ func (b Bot) String() string {
 }
 
 type Block struct {
-	UserID        ID        `json:"user_id"`
-	BlockedUserID ID        `json:"blocked_user_id"`
-	CreatedAT     Timestamp `json:"created_at"`
+	UserID        ID        `json:"user_id,omitempty"`
+	BlockedUserID ID        `json:"blocked_user_id,omitempty"`
+	CreatedAT     Timestamp `json:"created_at,omitempty"`
 }
 
 func (b Block) String() string {
