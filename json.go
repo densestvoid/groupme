@@ -89,6 +89,8 @@ type Member struct {
 	AutoKicked   bool   `json:"autokicked,omitempty"`
 	AppInstalled bool   `json:"app_installed,omitempty"`
 	GUID         string `json:"guid,omitempty"`
+	PhoneNumber  string `json:"phone_number,omitempty"` // Only used when searching for the member to add to a group.
+	Email        string `json:"email,omitempty"`        // Only used when searching for the member to add to a group.
 }
 
 func (m Member) String() string {
