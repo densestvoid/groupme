@@ -3,7 +3,6 @@ package groupme
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 )
@@ -77,7 +76,14 @@ func (c Client) do(req *http.Request, i interface{}) error {
 
 	// Check Status Code is 1XX or 2XX
 	if getResp.StatusCode/100 > 2 {
-		return fmt.Errorf("%s: %s", getResp.Status, string(bytes))
+		resp := newJSONResponse(nil)
+		if err := json.Unmarshal(bytes, &resp); err != nil {
+			// We couldn't parse the output.  Oh well; generate the appropriate error type anyway.
+			return &Meta{
+				Code: HTTPStatusCode(getResp.StatusCode),
+			}
+		}
+		return &resp.Meta
 	}
 
 	if i == nil {
@@ -87,11 +93,6 @@ func (c Client) do(req *http.Request, i interface{}) error {
 	resp := newJSONResponse(i)
 	if err := json.Unmarshal(bytes, &resp); err != nil {
 		return err
-	}
-
-	// Check Status Code is 1XX or 2XX
-	if resp.Meta.Code/100 > 2 {
-		return &resp.Meta
 	}
 
 	return nil
