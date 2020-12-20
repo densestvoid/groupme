@@ -69,13 +69,16 @@ func (c Client) do(req *http.Request, i interface{}) error {
 	}
 	defer getResp.Body.Close()
 
-	bytes, err := ioutil.ReadAll(getResp.Body)
-	if err != nil {
-		return err
-	}
-
 	// Check Status Code is 1XX or 2XX
 	if getResp.StatusCode/100 > 2 {
+		bytes, err := ioutil.ReadAll(getResp.Body)
+		if err != nil {
+			// We couldn't read the output.  Oh well; generate the appropriate error type anyway.
+			return &Meta{
+				Code: HTTPStatusCode(getResp.StatusCode),
+			}
+		}
+
 		resp := newJSONResponse(nil)
 		if err := json.Unmarshal(bytes, &resp); err != nil {
 			// We couldn't parse the output.  Oh well; generate the appropriate error type anyway.
@@ -88,6 +91,11 @@ func (c Client) do(req *http.Request, i interface{}) error {
 
 	if i == nil {
 		return nil
+	}
+
+	bytes, err := ioutil.ReadAll(getResp.Body)
+	if err != nil {
+		return err
 	}
 
 	resp := newJSONResponse(i)
