@@ -3,7 +3,6 @@ package groupme
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 )
@@ -70,28 +69,38 @@ func (c Client) do(req *http.Request, i interface{}) error {
 	}
 	defer getResp.Body.Close()
 
-	bytes, err := ioutil.ReadAll(getResp.Body)
-	if err != nil {
-		return err
-	}
-
 	// Check Status Code is 1XX or 2XX
 	if getResp.StatusCode/100 > 2 {
-		return fmt.Errorf("%s: %s", getResp.Status, string(bytes))
+		bytes, err := ioutil.ReadAll(getResp.Body)
+		if err != nil {
+			// We couldn't read the output.  Oh well; generate the appropriate error type anyway.
+			return &Meta{
+				Code: HTTPStatusCode(getResp.StatusCode),
+			}
+		}
+
+		resp := newJSONResponse(nil)
+		if err := json.Unmarshal(bytes, &resp); err != nil {
+			// We couldn't parse the output.  Oh well; generate the appropriate error type anyway.
+			return &Meta{
+				Code: HTTPStatusCode(getResp.StatusCode),
+			}
+		}
+		return &resp.Meta
 	}
 
 	if i == nil {
 		return nil
 	}
 
-	resp := newJSONResponse(i)
-	if err := json.Unmarshal(bytes, &resp); err != nil {
+	bytes, err := ioutil.ReadAll(getResp.Body)
+	if err != nil {
 		return err
 	}
 
-	// Check Status Code is 1XX or 2XX
-	if resp.Meta.Code/100 > 2 {
-		return &resp.Meta
+	resp := newJSONResponse(i)
+	if err := json.Unmarshal(bytes, &resp); err != nil {
+		return err
 	}
 
 	return nil
