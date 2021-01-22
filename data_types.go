@@ -1,3 +1,4 @@
+// Package groupme defines a client capable of executing API commands for the GroupMe chat service
 package groupme
 
 import (
@@ -44,7 +45,7 @@ func (t Timestamp) String() string {
 type PhoneNumber string
 
 // Treated as a constant
-var phoneNumberRegex = regexp.MustCompile(`^\+[0-9]+ [0-9]{10}$`)
+var phoneNumberRegex = regexp.MustCompile(`^\+\d+ \d{10}$`)
 
 // Valid checks if the ID string is alpha numeric
 func (pn PhoneNumber) Valid() bool {
@@ -55,40 +56,40 @@ func (pn PhoneNumber) String() string {
 	return string(pn)
 }
 
-// StatusCodes are returned by HTTP requests in
+// HTTPStatusCode are returned by HTTP requests in
 // the header and the json "meta" field
 type HTTPStatusCode int
 
 // Text used as constant name
 const (
-	HTTP_Ok                  HTTPStatusCode = 200
-	HTTP_Created             HTTPStatusCode = 201
-	HTTP_NoContent           HTTPStatusCode = 204
-	HTTP_NotModified         HTTPStatusCode = 304
-	HTTP_BadRequest          HTTPStatusCode = 400
-	HTTP_Unauthorized        HTTPStatusCode = 401
-	HTTP_Forbidden           HTTPStatusCode = 403
-	HTTP_NotFound            HTTPStatusCode = 404
-	HTTP_EnhanceYourCalm     HTTPStatusCode = 420
-	HTTP_InternalServerError HTTPStatusCode = 500
-	HTTP_BadGateway          HTTPStatusCode = 502
-	HTTP_ServiceUnavailable  HTTPStatusCode = 503
+	HTTPOk                  HTTPStatusCode = 200
+	HTTPCreated             HTTPStatusCode = 201
+	HTTPNoContent           HTTPStatusCode = 204
+	HTTPNotModified         HTTPStatusCode = 304
+	HTTPBadRequest          HTTPStatusCode = 400
+	HTTPUnauthorized        HTTPStatusCode = 401
+	HTTPForbidden           HTTPStatusCode = 403
+	HTTPNotFound            HTTPStatusCode = 404
+	HTTPEnhanceYourCalm     HTTPStatusCode = 420
+	HTTPInternalServerError HTTPStatusCode = 500
+	HTTPBadGateway          HTTPStatusCode = 502
+	HTTPServiceUnavailable  HTTPStatusCode = 503
 )
 
 // String returns the description of the status code according to GroupMe
 func (c HTTPStatusCode) String() string {
 	return map[HTTPStatusCode]string{
-		HTTP_Ok:                  "success",
-		HTTP_Created:             "resource was created successfully",
-		HTTP_NoContent:           "resource was deleted successfully",
-		HTTP_NotModified:         "no new data to return",
-		HTTP_BadRequest:          "invalid format or data specified in the request",
-		HTTP_Unauthorized:        "authentication credentials missing or incorrect",
-		HTTP_Forbidden:           "request refused due to update limits",
-		HTTP_NotFound:            "URI is invalid or resource does not exist",
-		HTTP_EnhanceYourCalm:     "application is being rate limited",
-		HTTP_InternalServerError: "something unexpected occurred",
-		HTTP_BadGateway:          "GroupMe is down or being upgraded",
-		HTTP_ServiceUnavailable:  "servers are overloaded, try again later",
+		HTTPOk:                  "success",
+		HTTPCreated:             "resource was created successfully",
+		HTTPNoContent:           "resource was deleted successfully",
+		HTTPNotModified:         "no new data to return",
+		HTTPBadRequest:          "invalid format or data specified in the request",
+		HTTPUnauthorized:        "authentication credentials missing or incorrect",
+		HTTPForbidden:           "request refused due to update limits",
+		HTTPNotFound:            "URI is invalid or resource does not exist",
+		HTTPEnhanceYourCalm:     "application is being rate limited",
+		HTTPInternalServerError: "something unexpected occurred",
+		HTTPBadGateway:          "GroupMe is down or being upgraded",
+		HTTPServiceUnavailable:  "servers are overloaded, try again later",
 	}[c]
 }

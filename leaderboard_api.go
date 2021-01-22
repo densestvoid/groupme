@@ -1,13 +1,15 @@
+// Package groupme defines a client capable of executing API commands for the GroupMe chat service
 package groupme
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 )
 
 // GroupMe documentation: https://dev.groupme.com/docs/v3#leaderboard
 
-////////// Endpoints //////////
+/*//////// Endpoints ////////*/
 const (
 	// Used to build other endpoints
 	leaderboardEndpointRoot = groupEndpointRoot + "/likes"
@@ -18,34 +20,22 @@ const (
 	myHitsLeaderboardEndpoint  = leaderboardEndpointRoot + "/for_me" // GET
 )
 
-////////// API Requests //////////
+/*//////// API Requests ////////*/
 
 // Index
 
 type period string
 
-func (p period) String() string {
-	return string(p)
-}
-
 // Define acceptable period values
 const (
-	Period_Day   = "day"
-	Period_Week  = "week"
-	Period_Month = "month"
+	PeriodDay   = "day"
+	PeriodWeek  = "week"
+	PeriodMonth = "month"
 )
 
-/*
-IndexLeaderboard -
-
-A list of the liked messages in the group for a given period of
-time. Messages are ranked in order of number of likes.
-
-Parameters:
-	groupID - required, ID(string)
-	p - required, period(string)
-*/
-func (c *Client) IndexLeaderboard(groupID ID, p period) ([]*Message, error) {
+// IndexLeaderboard - A list of the liked messages in the group for a given period of
+// time. Messages are ranked in order of number of likes.
+func (c *Client) IndexLeaderboard(ctx context.Context, groupID ID, p period) ([]*Message, error) {
 	url := fmt.Sprintf(c.endpointBase+indexLeaderboardEndpoint, groupID)
 	httpReq, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -54,13 +44,13 @@ func (c *Client) IndexLeaderboard(groupID ID, p period) ([]*Message, error) {
 
 	URL := httpReq.URL
 	query := URL.Query()
-	query.Set("period", p.String())
+	query.Set("period", string(p))
 	URL.RawQuery = query.Encode()
 
 	var resp struct {
 		Messages []*Message `json:"messages"`
 	}
-	err = c.doWithAuthToken(httpReq, &resp)
+	err = c.doWithAuthToken(ctx, httpReq, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +70,7 @@ timestamp in ISO-8601 format.
 Parameters:
 	groupID - required, ID(string)
 */
-func (c *Client) MyLikesLeaderboard(groupID ID) ([]*Message, error) {
+func (c *Client) MyLikesLeaderboard(ctx context.Context, groupID ID) ([]*Message, error) {
 	url := fmt.Sprintf(c.endpointBase+myLikesLeaderboardEndpoint, groupID)
 	httpReq, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -90,7 +80,7 @@ func (c *Client) MyLikesLeaderboard(groupID ID) ([]*Message, error) {
 	var resp struct {
 		Messages []*Message `json:"messages"`
 	}
-	err = c.doWithAuthToken(httpReq, &resp)
+	err = c.doWithAuthToken(ctx, httpReq, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -110,7 +100,7 @@ timestamp in ISO-8601 format.
 Parameters:
 	groupID - required, ID(string)
 */
-func (c *Client) MyHitsLeaderboard(groupID ID) ([]*Message, error) {
+func (c *Client) MyHitsLeaderboard(ctx context.Context, groupID ID) ([]*Message, error) {
 	url := fmt.Sprintf(c.endpointBase+myHitsLeaderboardEndpoint, groupID)
 	httpReq, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -120,7 +110,7 @@ func (c *Client) MyHitsLeaderboard(groupID ID) ([]*Message, error) {
 	var resp struct {
 		Messages []*Message `json:"messages"`
 	}
-	err = c.doWithAuthToken(httpReq, &resp)
+	err = c.doWithAuthToken(ctx, httpReq, &resp)
 	if err != nil {
 		return nil, err
 	}

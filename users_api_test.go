@@ -1,6 +1,8 @@
+// Package groupme defines a client capable of executing API commands for the GroupMe chat service
 package groupme
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"testing"
@@ -17,13 +19,13 @@ func (s *UsersAPISuite) SetupSuite() {
 }
 
 func (s *UsersAPISuite) TestUsersMe() {
-	user, err := s.client.MyUser()
+	user, err := s.client.MyUser(context.Background())
 	s.Require().NoError(err)
 	s.Assert().NotZero(user)
 }
 
 func (s *UsersAPISuite) TestUsersUpdate() {
-	user, err := s.client.UpdateMyUser(UserSettings{})
+	user, err := s.client.UpdateMyUser(context.Background(), UserSettings{})
 	s.Require().NoError(err)
 	s.Assert().NotZero(user)
 }
@@ -31,6 +33,8 @@ func (s *UsersAPISuite) TestUsersUpdate() {
 func TestUsersAPISuite(t *testing.T) {
 	suite.Run(t, new(UsersAPISuite))
 }
+
+// nolint // not duplicate code
 func usersTestRouter() *mux.Router {
 	router := mux.NewRouter().Queries("token", "").Subrouter()
 

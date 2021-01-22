@@ -1,3 +1,4 @@
+// Package groupme defines a client capable of executing API commands for the GroupMe chat service
 package groupme
 
 import (
@@ -14,7 +15,7 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-////////// Base API Suite //////////
+/*//////// Base API Suite ////////*/
 type APISuite struct {
 	// Base attributes
 	suite.Suite
@@ -22,7 +23,7 @@ type APISuite struct {
 	server *http.Server
 	wg     sync.WaitGroup
 
-	// Overriden by child Suite
+	// Overridden by child Suite
 	addr    string
 	handler http.Handler
 }
@@ -42,7 +43,7 @@ func (s *APISuite) TearDownSuite() {
 	s.wg.Wait()
 }
 
-///// Start Server /////
+/*/// Start Server ///*/
 func (s *APISuite) startServer(addr string, handler http.Handler) *http.Server {
 	server := &http.Server{
 		Addr:     addr,
@@ -60,6 +61,7 @@ func (s *APISuite) startServer(addr string, handler http.Handler) *http.Server {
 
 	// Wait until server has started listening
 	url := fmt.Sprintf("http://%s", addr)
+	// nolint // url is meant to be variable
 	for _, err := http.Get(url); err != nil; _, err = http.Get(url) {
 		continue
 	}
@@ -67,7 +69,7 @@ func (s *APISuite) startServer(addr string, handler http.Handler) *http.Server {
 	return server
 }
 
-///// Generate Ephemeral Port /////
+/*/// Generate Ephemeral Port ///*/
 const (
 	portMin   = 49152
 	portMax   = 65535
@@ -76,10 +78,11 @@ const (
 
 func (s *APISuite) generatePort() string {
 	rand.Seed(time.Now().UnixNano())
+	// nolint // weak random generator is ok for creating port number in a test
 	return strconv.Itoa((rand.Intn(portRange) + portMin))
 }
 
-////////// Test Main //////////
+/*//////// Test Main ////////*/
 func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }

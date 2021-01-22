@@ -1,6 +1,8 @@
+// Package groupme defines a client capable of executing API commands for the GroupMe chat service
 package groupme
 
 import (
+	"context"
 	"net/http"
 	"testing"
 
@@ -16,18 +18,20 @@ func (s *LikesAPISuite) SetupSuite() {
 }
 
 func (s *LikesAPISuite) TestLikesCreate() {
-	err := s.client.CreateLike("1", "1")
+	err := s.client.CreateLike(context.Background(), "1", "1")
 	s.Require().NoError(err)
 }
 
 func (s *LikesAPISuite) TestLikesDestroy() {
-	err := s.client.DestroyLike("1", "1")
+	err := s.client.DestroyLike(context.Background(), "1", "1")
 	s.Require().NoError(err)
 }
 
 func TestLikesAPISuite(t *testing.T) {
 	suite.Run(t, new(LikesAPISuite))
 }
+
+// nolint // not duplicate code
 func likesTestRouter() *mux.Router {
 	router := mux.NewRouter().Queries("token", "").Subrouter()
 

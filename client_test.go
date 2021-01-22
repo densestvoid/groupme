@@ -1,6 +1,8 @@
+// Package groupme defines a client capable of executing API commands for the GroupMe chat service
 package groupme
 
 import (
+	"context"
 	"net/http"
 	"testing"
 
@@ -34,7 +36,7 @@ func (s *ClientSuite) TestClient_do_PostContentType() {
 	req, err := http.NewRequest("POST", "", nil)
 	s.Require().NoError(err)
 
-	s.Assert().Error(s.client.do(req, struct{}{}))
+	s.Assert().Error(s.client.do(context.Background(), req, struct{}{}))
 	s.Assert().EqualValues(req.Header.Get("Content-Type"), "application/json")
 }
 
@@ -42,14 +44,14 @@ func (s *ClientSuite) TestClient_do_DoError() {
 	req, err := http.NewRequest("", "", nil)
 	s.Require().NoError(err)
 
-	s.Assert().Error(s.client.do(req, struct{}{}))
+	s.Assert().Error(s.client.do(context.Background(), req, struct{}{}))
 }
 
 func (s *ClientSuite) TestClient_do_UnmarshalError() {
 	req, err := http.NewRequest("GET", s.addr, nil)
 	s.Require().NoError(err)
 
-	s.Assert().Error(s.client.do(req, struct{}{}))
+	s.Assert().Error(s.client.do(context.Background(), req, struct{}{}))
 }
 
 func TestClientSuite(t *testing.T) {

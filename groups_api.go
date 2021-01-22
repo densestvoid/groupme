@@ -1,7 +1,9 @@
+// Package groupme defines a client capable of executing API commands for the GroupMe chat service
 package groupme
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -11,7 +13,7 @@ import (
 
 // GroupMe documentation: https://dev.groupme.com/docs/v3#groups
 
-////////// Endpoints //////////
+/*//////// Endpoints ////////*/
 const (
 	// Used to build other endpoints
 	groupsEndpointRoot = "/groups"
@@ -29,7 +31,7 @@ const (
 	changeGroupOwnerEndpoint = groupsEndpointRoot + "/change_owners" // POST
 )
 
-////////// Common Request Parameters //////////
+/*//////// Common Request Parameters ////////*/
 
 // GroupSettings is the settings for a group, used by CreateGroup and UpdateGroup
 type GroupSettings struct {
@@ -51,9 +53,9 @@ func (gss GroupSettings) String() string {
 	return marshal(&gss)
 }
 
-////////// API Requests //////////
+/*//////// API Requests ////////*/
 
-///// Index /////
+/*/// Index ///*/
 
 // GroupsQuery defines optional URL parameters for IndexGroups
 type GroupsQuery struct {
@@ -84,7 +86,7 @@ app for users who are participating in huge groups.
 
 Parameters: See GroupsQuery
 */
-func (c *Client) IndexGroups(req *GroupsQuery) ([]*Group, error) {
+func (c *Client) IndexGroups(ctx context.Context, req *GroupsQuery) ([]*Group, error) {
 	httpReq, err := http.NewRequest("GET", c.endpointBase+indexGroupsEndpoint, nil)
 	if err != nil {
 		return nil, err
@@ -106,7 +108,7 @@ func (c *Client) IndexGroups(req *GroupsQuery) ([]*Group, error) {
 	URL.RawQuery = query.Encode()
 
 	var resp []*Group
-	err = c.doWithAuthToken(httpReq, &resp)
+	err = c.doWithAuthToken(ctx, httpReq, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -114,21 +116,21 @@ func (c *Client) IndexGroups(req *GroupsQuery) ([]*Group, error) {
 	return resp, nil
 }
 
-///// Former /////
+/*/// Former ///*/
 
 /*
 FormerGroups -
 
 List they groups you have left but can rejoin.
 */
-func (c *Client) FormerGroups() ([]*Group, error) {
+func (c *Client) FormerGroups(ctx context.Context) ([]*Group, error) {
 	httpReq, err := http.NewRequest("GET", c.endpointBase+formerGroupsEndpoint, nil)
 	if err != nil {
 		return nil, err
 	}
 
 	var resp []*Group
-	err = c.doWithAuthToken(httpReq, &resp)
+	err = c.doWithAuthToken(ctx, httpReq, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -136,7 +138,7 @@ func (c *Client) FormerGroups() ([]*Group, error) {
 	return resp, nil
 }
 
-///// Show /////
+/*/// Show ///*/
 
 /*
 ShowGroup -
@@ -146,7 +148,7 @@ Loads a specific group.
 Parameters:
 	groupID - required, ID(string)
 */
-func (c *Client) ShowGroup(groupID ID) (*Group, error) {
+func (c *Client) ShowGroup(ctx context.Context, groupID ID) (*Group, error) {
 	URL := fmt.Sprintf(c.endpointBase+showGroupEndpoint, groupID)
 
 	httpReq, err := http.NewRequest("GET", URL, nil)
@@ -155,7 +157,7 @@ func (c *Client) ShowGroup(groupID ID) (*Group, error) {
 	}
 
 	var resp Group
-	err = c.doWithAuthToken(httpReq, &resp)
+	err = c.doWithAuthToken(ctx, httpReq, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -163,7 +165,7 @@ func (c *Client) ShowGroup(groupID ID) (*Group, error) {
 	return &resp, nil
 }
 
-///// Create /////
+/*/// Create ///*/
 
 /*
 CreateGroup -
@@ -172,7 +174,7 @@ Create a new group
 
 Parameters: See GroupSettings
 */
-func (c *Client) CreateGroup(gs GroupSettings) (*Group, error) {
+func (c *Client) CreateGroup(ctx context.Context, gs GroupSettings) (*Group, error) {
 	URL := fmt.Sprintf(c.endpointBase + createGroupEndpoint)
 
 	jsonBytes, err := json.Marshal(&gs)
@@ -186,7 +188,7 @@ func (c *Client) CreateGroup(gs GroupSettings) (*Group, error) {
 	}
 
 	var resp Group
-	err = c.doWithAuthToken(httpReq, &resp)
+	err = c.doWithAuthToken(ctx, httpReq, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -194,7 +196,7 @@ func (c *Client) CreateGroup(gs GroupSettings) (*Group, error) {
 	return &resp, nil
 }
 
-///// Update /////
+/*/// Update ///*/
 
 /*
 UpdateGroup -
@@ -205,7 +207,7 @@ Parameters:
 	groupID - required, ID(string)
 	See GroupSettings
 */
-func (c *Client) UpdateGroup(groupID ID, gs GroupSettings) (*Group, error) {
+func (c *Client) UpdateGroup(ctx context.Context, groupID ID, gs GroupSettings) (*Group, error) {
 	URL := fmt.Sprintf(c.endpointBase+updateGroupEndpoint, groupID)
 
 	jsonBytes, err := json.Marshal(&gs)
@@ -219,7 +221,7 @@ func (c *Client) UpdateGroup(groupID ID, gs GroupSettings) (*Group, error) {
 	}
 
 	var resp Group
-	err = c.doWithAuthToken(httpReq, &resp)
+	err = c.doWithAuthToken(ctx, httpReq, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -227,7 +229,7 @@ func (c *Client) UpdateGroup(groupID ID, gs GroupSettings) (*Group, error) {
 	return &resp, nil
 }
 
-///// Destroy /////
+/*/// Destroy ///*/
 
 /*
 DestroyGroup -
@@ -239,7 +241,7 @@ This action is only available to the group creator
 Parameters:
 	groupID - required, ID(string)
 */
-func (c *Client) DestroyGroup(groupID ID) error {
+func (c *Client) DestroyGroup(ctx context.Context, groupID ID) error {
 	url := fmt.Sprintf(c.endpointBase+destroyGroupEndpoint, groupID)
 
 	httpReq, err := http.NewRequest("POST", url, nil)
@@ -247,10 +249,10 @@ func (c *Client) DestroyGroup(groupID ID) error {
 		return err
 	}
 
-	return c.doWithAuthToken(httpReq, nil)
+	return c.doWithAuthToken(ctx, httpReq, nil)
 }
 
-///// Join /////
+/*/// Join ///*/
 
 /*
 JoinGroup -
@@ -261,7 +263,7 @@ Parameters:
 	groupID - required, ID(string)
 	shareToken - required, string
 */
-func (c *Client) JoinGroup(groupID ID, shareToken string) (*Group, error) {
+func (c *Client) JoinGroup(ctx context.Context, groupID ID, shareToken string) (*Group, error) {
 	URL := fmt.Sprintf(c.endpointBase+joinGroupEndpoint, groupID, shareToken)
 
 	httpReq, err := http.NewRequest("POST", URL, nil)
@@ -270,7 +272,7 @@ func (c *Client) JoinGroup(groupID ID, shareToken string) (*Group, error) {
 	}
 
 	var resp Group
-	err = c.doWithAuthToken(httpReq, &resp)
+	err = c.doWithAuthToken(ctx, httpReq, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -278,7 +280,7 @@ func (c *Client) JoinGroup(groupID ID, shareToken string) (*Group, error) {
 	return &resp, nil
 }
 
-///// Rejoin /////
+/*/// Rejoin ///*/
 
 /*
 RejoinGroup -
@@ -288,7 +290,7 @@ Rejoin a group. Only works if you previously removed yourself.
 Parameters:
 	groupID - required, ID(string)
 */
-func (c *Client) RejoinGroup(groupID ID) (*Group, error) {
+func (c *Client) RejoinGroup(ctx context.Context, groupID ID) (*Group, error) {
 	URL := fmt.Sprintf(c.endpointBase + rejoinGroupEndpoint)
 
 	var data = struct {
@@ -308,7 +310,7 @@ func (c *Client) RejoinGroup(groupID ID) (*Group, error) {
 	}
 
 	var resp Group
-	err = c.doWithAuthToken(httpReq, &resp)
+	err = c.doWithAuthToken(ctx, httpReq, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -316,12 +318,10 @@ func (c *Client) RejoinGroup(groupID ID) (*Group, error) {
 	return &resp, nil
 }
 
-///// Change Owner /////
+/*/// Change Owner ///*/
 
 /*
-ChangeGroupOwner-
-
-Change owner of requested groups.
+ChangeGroupOwner - Change owner of requested groups.
 
 This action is only available to the group creator.
 
@@ -330,7 +330,7 @@ the result of change owner action for the request
 
 Parameters: See ChangeOwnerRequest
 */
-func (c *Client) ChangeGroupOwner(reqs ChangeOwnerRequest) (ChangeOwnerResult, error) {
+func (c *Client) ChangeGroupOwner(ctx context.Context, reqs ChangeOwnerRequest) (ChangeOwnerResult, error) {
 	URL := fmt.Sprintf(c.endpointBase + changeGroupOwnerEndpoint)
 
 	var data = struct {
@@ -353,7 +353,7 @@ func (c *Client) ChangeGroupOwner(reqs ChangeOwnerRequest) (ChangeOwnerResult, e
 		Results []ChangeOwnerResult `json:"results"`
 	}
 
-	err = c.doWithAuthToken(httpReq, &resp)
+	err = c.doWithAuthToken(ctx, httpReq, &resp)
 	if err != nil {
 		return ChangeOwnerResult{}, err
 	}
@@ -365,24 +365,25 @@ func (c *Client) ChangeGroupOwner(reqs ChangeOwnerRequest) (ChangeOwnerResult, e
 	return resp.Results[0], nil
 }
 
-type ChangeOwnerStatusCode string
+type changeOwnerStatusCode string
 
+// Change owner Status Codes
 const (
-	ChangeOwner_Ok                ChangeOwnerStatusCode = "200"
-	ChangeOwner_RequesterNewOwner ChangeOwnerStatusCode = "400"
-	ChangeOwner_NotOwner          ChangeOwnerStatusCode = "403"
-	ChangeOwner_BadGroupOrOwner   ChangeOwnerStatusCode = "404"
-	ChangeOwner_BadRequest        ChangeOwnerStatusCode = "405"
+	ChangeOwnerOk                changeOwnerStatusCode = "200"
+	ChangeOwnerRequesterNewOwner changeOwnerStatusCode = "400"
+	ChangeOwnerNotOwner          changeOwnerStatusCode = "403"
+	ChangeOwnerBadGroupOrOwner   changeOwnerStatusCode = "404"
+	ChangeOwnerBadRequest        changeOwnerStatusCode = "405"
 )
 
 // String returns the description of the status code according to GroupMe
-func (c ChangeOwnerStatusCode) String() string {
-	return map[ChangeOwnerStatusCode]string{
-		ChangeOwner_Ok:                "success",
-		ChangeOwner_RequesterNewOwner: "requester is also a new owner",
-		ChangeOwner_NotOwner:          "requester is not the owner of the group",
-		ChangeOwner_BadGroupOrOwner:   "group or new owner not found or new owner is not memeber of the group",
-		ChangeOwner_BadRequest:        "request object is missing required field or any of the required fields is not an ID",
+func (c changeOwnerStatusCode) String() string {
+	return map[changeOwnerStatusCode]string{
+		ChangeOwnerOk:                "success",
+		ChangeOwnerRequesterNewOwner: "requester is also a new owner",
+		ChangeOwnerNotOwner:          "requester is not the owner of the group",
+		ChangeOwnerBadGroupOrOwner:   "group or new owner not found or new owner is not member of the group",
+		ChangeOwnerBadRequest:        "request object is missing required field or any of the required fields is not an ID",
 	}[c]
 }
 
@@ -405,7 +406,7 @@ type ChangeOwnerResult struct {
 	// UserId of the new owner of the group who is
 	// an active member of the group
 	OwnerID string                `json:"owner_id"`
-	Status  ChangeOwnerStatusCode `json:"status"`
+	Status  changeOwnerStatusCode `json:"status"`
 }
 
 func (r ChangeOwnerResult) String() string {

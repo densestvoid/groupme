@@ -1,7 +1,9 @@
+// Package groupme defines a client capable of executing API commands for the GroupMe chat service
 package groupme
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -9,7 +11,7 @@ import (
 
 // GroupMe documentation: https://dev.groupme.com/docs/v3#sms_mode
 
-////////// Endpoints //////////
+/*//////// Endpoints ////////*/
 const (
 	// Used to build other endpoints
 	smsModeEndpointRoot = usersEndpointRoot + "/sms_mode"
@@ -19,7 +21,7 @@ const (
 	deleteSMSModeEndpoint = smsModeEndpointRoot + "/delete" // POST
 )
 
-////////// API Requests //////////
+/*//////// API Requests ////////*/
 
 // Create
 
@@ -35,7 +37,7 @@ Parameters:
 		omitted, both SMS and push notifications will be
 		delivered to the device.
 */
-func (c *Client) CreateSMSMode(duration int, registrationID *ID) error {
+func (c *Client) CreateSMSMode(ctx context.Context, duration int, registrationID *ID) error {
 	URL := fmt.Sprintf(c.endpointBase + createSMSModeEndpoint)
 
 	var data = struct {
@@ -56,7 +58,7 @@ func (c *Client) CreateSMSMode(duration int, registrationID *ID) error {
 		return err
 	}
 
-	err = c.doWithAuthToken(httpReq, nil)
+	err = c.doWithAuthToken(ctx, httpReq, nil)
 	if err != nil {
 		return err
 	}
@@ -71,7 +73,7 @@ DeleteSMSMode -
 
 Disables SMS mode
 */
-func (c *Client) DeleteSMSMode() error {
+func (c *Client) DeleteSMSMode(ctx context.Context) error {
 	url := fmt.Sprintf(c.endpointBase + deleteSMSModeEndpoint)
 
 	httpReq, err := http.NewRequest("POST", url, nil)
@@ -79,5 +81,5 @@ func (c *Client) DeleteSMSMode() error {
 		return err
 	}
 
-	return c.doWithAuthToken(httpReq, nil)
+	return c.doWithAuthToken(ctx, httpReq, nil)
 }

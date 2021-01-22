@@ -1,6 +1,8 @@
+// Package groupme defines a client capable of executing API commands for the GroupMe chat service
 package groupme
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"testing"
@@ -17,11 +19,14 @@ func (s *GroupsAPISuite) SetupSuite() {
 }
 
 func (s *GroupsAPISuite) TestGroupsIndex() {
-	groups, err := s.client.IndexGroups(&GroupsQuery{
-		Page:    5,
-		PerPage: 20,
-		Omit:    "memberships",
-	})
+	groups, err := s.client.IndexGroups(
+		context.Background(),
+		&GroupsQuery{
+			Page:    5,
+			PerPage: 20,
+			Omit:    "memberships",
+		},
+	)
 	s.Require().NoError(err)
 	s.Require().NotZero(groups)
 	for _, group := range groups {
@@ -30,7 +35,7 @@ func (s *GroupsAPISuite) TestGroupsIndex() {
 }
 
 func (s *GroupsAPISuite) TestGroupsFormer() {
-	groups, err := s.client.FormerGroups()
+	groups, err := s.client.FormerGroups(context.Background())
 	s.Require().NoError(err)
 	s.Require().NotZero(groups)
 	for _, group := range groups {
@@ -39,25 +44,28 @@ func (s *GroupsAPISuite) TestGroupsFormer() {
 }
 
 func (s *GroupsAPISuite) TestGroupsShow() {
-	group, err := s.client.ShowGroup("1")
+	group, err := s.client.ShowGroup(context.Background(), "1")
 	s.Require().NoError(err)
 	s.Assert().NotZero(group)
 }
 
 func (s *GroupsAPISuite) TestGroupsCreate() {
-	group, err := s.client.CreateGroup(GroupSettings{
-		"Test",
-		"This is a test group",
-		"www.blank.com/image",
-		false,
-		true,
-	})
+	group, err := s.client.CreateGroup(
+		context.Background(),
+		GroupSettings{
+			"Test",
+			"This is a test group",
+			"www.blank.com/image",
+			false,
+			true,
+		},
+	)
 	s.Require().NoError(err)
 	s.Assert().NotZero(group)
 }
 
 func (s *GroupsAPISuite) TestGroupsUpdate() {
-	group, err := s.client.UpdateGroup("1", GroupSettings{
+	group, err := s.client.UpdateGroup(context.Background(), "1", GroupSettings{
 		"Test",
 		"This is a test group",
 		"www.blank.com/image",
@@ -69,24 +77,25 @@ func (s *GroupsAPISuite) TestGroupsUpdate() {
 }
 
 func (s *GroupsAPISuite) TestGroupsDestroy() {
-	err := s.client.DestroyGroup("1")
+	err := s.client.DestroyGroup(context.Background(), "1")
 	s.Require().NoError(err)
 }
 
 func (s *GroupsAPISuite) TestGroupsJoin() {
-	group, err := s.client.JoinGroup("1", "please")
+	group, err := s.client.JoinGroup(context.Background(), "1", "please")
 	s.Require().NoError(err)
 	s.Assert().NotZero(group)
 }
 
 func (s *GroupsAPISuite) TestGroupsRejoin() {
-	group, err := s.client.RejoinGroup("1")
+	group, err := s.client.RejoinGroup(context.Background(), "1")
 	s.Require().NoError(err)
 	s.Assert().NotZero(group)
 }
 
 func (s *GroupsAPISuite) TestGroupsChangeOwner() {
 	result, err := s.client.ChangeGroupOwner(
+		context.Background(),
 		ChangeOwnerRequest{
 			"1",
 			"123",
@@ -99,8 +108,9 @@ func TestGroupsAPISuite(t *testing.T) {
 	suite.Run(t, new(GroupsAPISuite))
 }
 
-////////// Test Groups Router //////////
+/*//////// Test Groups Router ////////*/
 
+// nolint // not duplicate code
 func groupsTestRouter() *mux.Router {
 	router := mux.NewRouter().Queries("token", "").Subrouter()
 

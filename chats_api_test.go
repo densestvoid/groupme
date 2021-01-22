@@ -1,6 +1,8 @@
+// Package groupme defines a client capable of executing API commands for the GroupMe chat service
 package groupme
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"testing"
@@ -18,6 +20,7 @@ func (s *ChatsAPISuite) SetupSuite() {
 
 func (s *ChatsAPISuite) TestChatsIndex() {
 	chats, err := s.client.IndexChats(
+		context.Background(),
 		&IndexChatsQuery{
 			Page:    1,
 			PerPage: 20,

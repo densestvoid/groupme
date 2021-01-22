@@ -1,3 +1,4 @@
+// Package groupme defines a client capable of executing API commands for the GroupMe chat service
 package groupme
 
 import (
@@ -53,7 +54,7 @@ type MessagePreview struct {
 
 // GetMemberByUserID gets the group member by their UserID,
 // nil if no member matches
-func (g Group) GetMemberByUserID(userID ID) *Member {
+func (g *Group) GetMemberByUserID(userID ID) *Member {
 	for _, member := range g.Members {
 		if member.UserID == userID {
 			return member
@@ -65,7 +66,7 @@ func (g Group) GetMemberByUserID(userID ID) *Member {
 
 // GetMemberByNickname gets the group member by their Nickname,
 // nil if no member matches
-func (g Group) GetMemberByNickname(nickname string) *Member {
+func (g *Group) GetMemberByNickname(nickname string) *Member {
 	for _, member := range g.Members {
 		if member.Nickname == nickname {
 			return member
@@ -75,8 +76,8 @@ func (g Group) GetMemberByNickname(nickname string) *Member {
 	return nil
 }
 
-func (g Group) String() string {
-	return marshal(&g)
+func (g *Group) String() string {
+	return marshal(g)
 }
 
 // Member is a GroupMe group member, returned in JSON API responses
@@ -93,8 +94,8 @@ type Member struct {
 	Email        string `json:"email,omitempty"`        // Only used when searching for the member to add to a group.
 }
 
-func (m Member) String() string {
-	return marshal(&m)
+func (m *Member) String() string {
+	return marshal(m)
 }
 
 // Message is a GroupMe group message, returned in JSON API responses
@@ -106,7 +107,7 @@ type Message struct {
 	UserID         ID         `json:"user_id,omitempty"`
 	BotID          ID         `json:"bot_id,omitempty"`
 	SenderID       ID         `json:"sender_id,omitempty"`
-	SenderType     SenderType `json:"sender_type,omitempty"`
+	SenderType     senderType `json:"sender_type,omitempty"`
 	System         bool       `json:"system,omitempty"`
 	Name           string     `json:"name,omitempty"`
 	RecipientID    ID         `json:"recipient_id,omitempty"`
@@ -120,32 +121,32 @@ type Message struct {
 	Attachments []*Attachment `json:"attachments,omitempty"`
 }
 
-func (m Message) String() string {
-	return marshal(&m)
+func (m *Message) String() string {
+	return marshal(m)
 }
 
-type SenderType string
+type senderType string
 
 // SenderType constants
 const (
-	SenderType_User   SenderType = "user"
-	SenderType_Bot    SenderType = "bot"
-	SenderType_System SenderType = "system"
+	SenderTypeUser   senderType = "user"
+	SenderTypeBot    senderType = "bot"
+	SenderTypeSystem senderType = "system"
 )
 
-type AttachmentType string
+type attachmentType string
 
 // AttachmentType constants
 const (
-	Mentions AttachmentType = "mentions"
-	Image    AttachmentType = "image"
-	Location AttachmentType = "location"
-	Emoji    AttachmentType = "emoji"
+	Mentions attachmentType = "mentions"
+	Image    attachmentType = "image"
+	Location attachmentType = "location"
+	Emoji    attachmentType = "emoji"
 )
 
 // Attachment is a GroupMe message attachment, returned in JSON API responses
 type Attachment struct {
-	Type        AttachmentType `json:"type,omitempty"`
+	Type        attachmentType `json:"type,omitempty"`
 	Loci        [][]int        `json:"loci,omitempty"`
 	UserIDs     []ID           `json:"user_ids,omitempty"`
 	URL         string         `json:"url,omitempty"`
@@ -156,8 +157,8 @@ type Attachment struct {
 	Charmap     [][]int        `json:"charmap,omitempty"`
 }
 
-func (a Attachment) String() string {
-	return marshal(&a)
+func (a *Attachment) String() string {
+	return marshal(a)
 }
 
 // User is a GroupMe user, returned in JSON API responses
@@ -173,8 +174,8 @@ type User struct {
 	SMS         bool        `json:"sms,omitempty"`
 }
 
-func (u User) String() string {
-	return marshal(&u)
+func (u *User) String() string {
+	return marshal(u)
 }
 
 // Chat is a GroupMe direct message conversation between two users,
@@ -187,10 +188,11 @@ type Chat struct {
 	OtherUser     User      `json:"other_user,omitempty"`
 }
 
-func (c Chat) String() string {
-	return marshal(&c)
+func (c *Chat) String() string {
+	return marshal(c)
 }
 
+// Bot is a GroupMe bot, it is connected to a specific group which it can send messages to
 type Bot struct {
 	BotID          ID     `json:"bot_id,omitempty"`
 	GroupID        ID     `json:"group_id,omitempty"`
@@ -200,10 +202,11 @@ type Bot struct {
 	DMNotification bool   `json:"dm_notification,omitempty"`
 }
 
-func (b Bot) String() string {
-	return marshal(&b)
+func (b *Bot) String() string {
+	return marshal(b)
 }
 
+// Block is a GroupMe block between two users, direct messages are not allowed
 type Block struct {
 	UserID        ID        `json:"user_id,omitempty"`
 	BlockedUserID ID        `json:"blocked_user_id,omitempty"`

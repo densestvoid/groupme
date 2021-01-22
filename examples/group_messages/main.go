@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/densestvoid/groupme"
@@ -18,11 +19,14 @@ func main() {
 	client := groupme.NewClient(authorizationToken)
 
 	// Get the groups your user is part of
-	groups, err := client.IndexGroups(&groupme.GroupsQuery{
-		Page:    0,
-		PerPage: 5,
-		Omit:    "memberships",
-	})
+	groups, err := client.IndexGroups(
+		context.Background(),
+		&groupme.GroupsQuery{
+			Page:    0,
+			PerPage: 5,
+			Omit:    "memberships",
+		},
+	)
 
 	if err != nil {
 		fmt.Println(err)
@@ -32,11 +36,11 @@ func main() {
 	fmt.Println(groups)
 
 	// Get first 10 messages of the first group
-	if len(groups) <= 0 {
+	if len(groups) == 0 {
 		fmt.Println("No groups")
 	}
 
-	messages, err := client.IndexMessages(groups[0].ID, &groupme.IndexMessagesQuery{
+	messages, err := client.IndexMessages(context.Background(), groups[0].ID, &groupme.IndexMessagesQuery{
 		Limit: 10,
 	})
 

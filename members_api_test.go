@@ -1,6 +1,8 @@
+// Package groupme defines a client capable of executing API commands for the GroupMe chat service
 package groupme
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"testing"
@@ -18,6 +20,7 @@ func (s *MembersAPISuite) SetupSuite() {
 
 func (s *MembersAPISuite) TestMembersAdd() {
 	_, err := s.client.AddMembers(
+		context.Background(),
 		"1",
 		&Member{Nickname: "test"},
 	)
@@ -25,17 +28,17 @@ func (s *MembersAPISuite) TestMembersAdd() {
 }
 
 func (s *MembersAPISuite) TestMembersResults() {
-	_, err := s.client.AddMembersResults("1", "123")
+	_, err := s.client.AddMembersResults(context.Background(), "1", "123")
 	s.Require().NoError(err)
 }
 
 func (s *MembersAPISuite) TestMembersRemove() {
-	err := s.client.RemoveMember("1", "123")
+	err := s.client.RemoveMember(context.Background(), "1", "123")
 	s.Require().NoError(err)
 }
 
 func (s *MembersAPISuite) TestMembersUpdate() {
-	_, err := s.client.UpdateMember("1", "nickname")
+	_, err := s.client.UpdateMember(context.Background(), "1", "nickname")
 	s.Require().NoError(err)
 }
 

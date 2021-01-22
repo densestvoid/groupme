@@ -1,13 +1,15 @@
+// Package groupme defines a client capable of executing API commands for the GroupMe chat service
 package groupme
 
 import (
+	"context"
 	"net/http"
 	"strconv"
 )
 
 // GroupMe documentation: https://dev.groupme.com/docs/v3#chats
 
-////////// Endpoints //////////
+/*//////// Endpoints ////////*/
 const (
 	// Used to build other endpoints
 	chatsEndpointRoot = "/chats"
@@ -15,9 +17,7 @@ const (
 	indexChatsEndpoint = chatsEndpointRoot // GET
 )
 
-// Index
-
-// ChatsQuery defines the optional URL parameters for IndexChats
+// IndexChatsQuery defines the optional URL parameters for IndexChats
 type IndexChatsQuery struct {
 	// Page Number
 	Page int `json:"page"`
@@ -25,15 +25,9 @@ type IndexChatsQuery struct {
 	PerPage int `json:"per_page"`
 }
 
-/*
-IndexChats -
-
-Returns a paginated list of direct message chats, or
-conversations, sorted by updated_at descending.
-
-Parameters: See ChatsQuery
-*/
-func (c *Client) IndexChats(req *IndexChatsQuery) ([]*Chat, error) {
+// IndexChats - Returns a paginated list of direct message chats, or
+// conversations, sorted by updated_at descending.
+func (c *Client) IndexChats(ctx context.Context, req *IndexChatsQuery) ([]*Chat, error) {
 	httpReq, err := http.NewRequest("GET", c.endpointBase+indexChatsEndpoint, nil)
 	if err != nil {
 		return nil, err
@@ -52,7 +46,7 @@ func (c *Client) IndexChats(req *IndexChatsQuery) ([]*Chat, error) {
 	URL.RawQuery = query.Encode()
 
 	var resp []*Chat
-	err = c.doWithAuthToken(httpReq, &resp)
+	err = c.doWithAuthToken(ctx, httpReq, &resp)
 	if err != nil {
 		return nil, err
 	}

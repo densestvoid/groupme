@@ -1,7 +1,9 @@
+// Package groupme defines a client capable of executing API commands for the GroupMe chat service
 package groupme
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -9,7 +11,7 @@ import (
 
 // GroupMe documentation: https://dev.groupme.com/docs/v3#users
 
-////////// Endpoints //////////
+/*//////// Endpoints ////////*/
 const (
 	// Used to build other endpoints
 	usersEndpointRoot = "/users"
@@ -19,7 +21,7 @@ const (
 	updateMyUserEndpoint = usersEndpointRoot + "/update" // POST
 )
 
-////////// API Requests //////////
+/*//////// API Requests ////////*/
 
 // Me
 
@@ -31,7 +33,7 @@ Loads a specific group.
 Parameters:
 	groupID - required, ID(string)
 */
-func (c *Client) MyUser() (*User, error) {
+func (c *Client) MyUser(ctx context.Context) (*User, error) {
 	URL := fmt.Sprintf(c.endpointBase + myUserEndpoint)
 
 	httpReq, err := http.NewRequest("GET", URL, nil)
@@ -40,7 +42,7 @@ func (c *Client) MyUser() (*User, error) {
 	}
 
 	var resp User
-	err = c.doWithAuthToken(httpReq, &resp)
+	err = c.doWithAuthToken(ctx, httpReq, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -48,8 +50,7 @@ func (c *Client) MyUser() (*User, error) {
 	return &resp, nil
 }
 
-// Update
-
+// UserSettings are the settings for a GroupMe user
 type UserSettings struct {
 	// URL to valid JPG/PNG/GIF image. URL will be converted into
 	// an image service link (https://i.groupme.com/....)
@@ -68,7 +69,7 @@ Update attributes about your own account
 
 Parameters: See UserSettings
 */
-func (c *Client) UpdateMyUser(us UserSettings) (*User, error) {
+func (c *Client) UpdateMyUser(ctx context.Context, us UserSettings) (*User, error) {
 	URL := fmt.Sprintf(c.endpointBase + updateMyUserEndpoint)
 
 	jsonBytes, err := json.Marshal(&us)
@@ -82,7 +83,7 @@ func (c *Client) UpdateMyUser(us UserSettings) (*User, error) {
 	}
 
 	var resp User
-	err = c.doWithAuthToken(httpReq, &resp)
+	err = c.doWithAuthToken(ctx, httpReq, &resp)
 	if err != nil {
 		return nil, err
 	}

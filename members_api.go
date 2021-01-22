@@ -1,7 +1,9 @@
+// Package groupme defines a client capable of executing API commands for the GroupMe chat service
 package groupme
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -9,7 +11,7 @@ import (
 
 // GroupMe documentation: https://dev.groupme.com/docs/v3#members
 
-////////// Endpoints //////////
+/*//////// Endpoints ////////*/
 const (
 	// Used to build other endpoints
 	membersEndpointRoot = groupEndpointRoot + "/members"
@@ -21,7 +23,7 @@ const (
 	updateMemberEndpoint      = groupEndpointRoot + "/memberships/update" // POST
 )
 
-///// Add /////
+/*/// Add ///*/
 
 /*
 AddMembers -
@@ -46,7 +48,7 @@ Parameters:
 			PhoneNumber - PhoneNumber(string)
 			Email - string
 */
-func (c *Client) AddMembers(groupID ID, members ...*Member) (string, error) {
+func (c *Client) AddMembers(ctx context.Context, groupID ID, members ...*Member) (string, error) {
 	URL := fmt.Sprintf(c.endpointBase+addMembersEndpoint, groupID)
 
 	var data = struct {
@@ -69,7 +71,7 @@ func (c *Client) AddMembers(groupID ID, members ...*Member) (string, error) {
 		ResultsID string `json:"results_id"`
 	}
 
-	err = c.doWithAuthToken(httpReq, &resp)
+	err = c.doWithAuthToken(ctx, httpReq, &resp)
 	if err != nil {
 		return "", err
 	}
@@ -77,7 +79,7 @@ func (c *Client) AddMembers(groupID ID, members ...*Member) (string, error) {
 	return resp.ResultsID, nil
 }
 
-///// Results /////
+/*/// Results ///*/
 
 /*
 AddMembersResults -
@@ -95,7 +97,7 @@ Parameters:
 	groupID - required, ID(string)
 	resultID - required, string
 */
-func (c *Client) AddMembersResults(groupID ID, resultID string) ([]*Member, error) {
+func (c *Client) AddMembersResults(ctx context.Context, groupID ID, resultID string) ([]*Member, error) {
 	URL := fmt.Sprintf(c.endpointBase+addMembersResultsEndpoint, groupID, resultID)
 
 	httpReq, err := http.NewRequest("GET", URL, nil)
@@ -107,7 +109,7 @@ func (c *Client) AddMembersResults(groupID ID, resultID string) ([]*Member, erro
 		Members []*Member `json:"members"`
 	}
 
-	err = c.doWithAuthToken(httpReq, &resp)
+	err = c.doWithAuthToken(ctx, httpReq, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -115,7 +117,7 @@ func (c *Client) AddMembersResults(groupID ID, resultID string) ([]*Member, erro
 	return resp.Members, nil
 }
 
-///// Remove /////
+/*/// Remove ///*/
 
 /*
 RemoveMember -
@@ -128,7 +130,7 @@ Parameters:
 	groupID - required, ID(string)
 	membershipID - required, ID(string). Not the same as userID
 */
-func (c *Client) RemoveMember(groupID, membershipID ID) error {
+func (c *Client) RemoveMember(ctx context.Context, groupID, membershipID ID) error {
 	URL := fmt.Sprintf(c.endpointBase+removeMemberEndpoint, groupID, membershipID)
 
 	httpReq, err := http.NewRequest("POST", URL, nil)
@@ -136,10 +138,10 @@ func (c *Client) RemoveMember(groupID, membershipID ID) error {
 		return err
 	}
 
-	return c.doWithAuthToken(httpReq, nil)
+	return c.doWithAuthToken(ctx, httpReq, nil)
 }
 
-///// Update /////
+/*/// Update ///*/
 
 /*
 UpdateMember -
@@ -147,7 +149,7 @@ UpdateMember -
 Update your nickname in a group. The nickname must be
 between 1 and 50 characters.
 */
-func (c *Client) UpdateMember(groupID ID, nickname string) (*Member, error) {
+func (c *Client) UpdateMember(ctx context.Context, groupID ID, nickname string) (*Member, error) {
 	URL := fmt.Sprintf(c.endpointBase+updateMemberEndpoint, groupID)
 
 	type Nickname struct {
@@ -171,7 +173,7 @@ func (c *Client) UpdateMember(groupID ID, nickname string) (*Member, error) {
 
 	var resp Member
 
-	err = c.doWithAuthToken(httpReq, &resp)
+	err = c.doWithAuthToken(ctx, httpReq, &resp)
 	if err != nil {
 		return nil, err
 	}

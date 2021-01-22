@@ -1,6 +1,8 @@
+// Package groupme defines a client capable of executing API commands for the GroupMe chat service
 package groupme
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"testing"
@@ -17,7 +19,7 @@ func (s *LeaderboardAPISuite) SetupSuite() {
 }
 
 func (s *LeaderboardAPISuite) TestLeaderboardIndex() {
-	messages, err := s.client.IndexLeaderboard("1", Period_Day)
+	messages, err := s.client.IndexLeaderboard(context.Background(), "1", PeriodDay)
 	s.Require().NoError(err)
 	s.Require().NotZero(messages)
 	for _, message := range messages {
@@ -26,7 +28,7 @@ func (s *LeaderboardAPISuite) TestLeaderboardIndex() {
 }
 
 func (s *LeaderboardAPISuite) TestLeaderboardMyLikes() {
-	messages, err := s.client.MyLikesLeaderboard("1")
+	messages, err := s.client.MyLikesLeaderboard(context.Background(), "1")
 	s.Require().NoError(err)
 	s.Require().NotZero(messages)
 	for _, message := range messages {
@@ -35,7 +37,7 @@ func (s *LeaderboardAPISuite) TestLeaderboardMyLikes() {
 }
 
 func (s *LeaderboardAPISuite) TestLeaderboardMyHits() {
-	messages, err := s.client.MyHitsLeaderboard("1")
+	messages, err := s.client.MyHitsLeaderboard(context.Background(), "1")
 	s.Require().NoError(err)
 	s.Require().NotZero(messages)
 	for _, message := range messages {
@@ -47,6 +49,7 @@ func TestLeaderboardAPISuite(t *testing.T) {
 	suite.Run(t, new(LeaderboardAPISuite))
 }
 
+// nolint // not duplicate code
 func leaderboardTestRouter() *mux.Router {
 	router := mux.NewRouter().Queries("token", "").Subrouter()
 

@@ -1,7 +1,9 @@
+// Package groupme defines a client capable of executing API commands for the GroupMe chat service
 package groupme
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -9,7 +11,7 @@ import (
 
 // GroupMe documentation: https://dev.groupme.com/docs/v3#bots
 
-////////// Endpoints //////////
+/*//////// Endpoints ////////*/
 const (
 	// Used to build other endpoints
 	botsEndpointRoot = "/bots"
@@ -21,22 +23,11 @@ const (
 	destroyBotEndpoint     = botsEndpointRoot + "/destroy" // POST
 )
 
-////////// API Requests //////////
+/*//////// API Requests ////////*/
 
-// Create
-
-/*
-CreateBot -
-
-Create a bot. See the Bots Tutorial (https://dev.groupme.com/tutorials/bots)
-for a full walkthrough.
-
-Parameters:
-	See Bot
-	Name - required
-	GroupID - required
-*/
-func (c *Client) CreateBot(bot *Bot) (*Bot, error) {
+// CreateBot - Create a bot. See the Bots Tutorial (https://dev.groupme.com/tutorials/bots)
+// for a full walkthrough.
+func (c *Client) CreateBot(ctx context.Context, bot *Bot) (*Bot, error) {
 	URL := c.endpointBase + createBotEndpoint
 
 	var data = struct {
@@ -56,7 +47,7 @@ func (c *Client) CreateBot(bot *Bot) (*Bot, error) {
 	}
 
 	var resp Bot
-	err = c.doWithAuthToken(httpReq, &resp)
+	err = c.doWithAuthToken(ctx, httpReq, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -64,21 +55,9 @@ func (c *Client) CreateBot(bot *Bot) (*Bot, error) {
 	return &resp, nil
 }
 
-// PostMessage
-
-/*
-PostBotMessage -
-
-Post a message from a bot
-
-Parameters:
-	botID - required, ID(string)
-	text - required, string
-	pictureURL - string; image must be processed through image
-				service (https://dev.groupme.com/docs/image_service)
-*/
+// PostBotMessage - Post a message from a bot
 // TODO: Move PostBotMessage to bot object, since it doesn't require access token
-func (c *Client) PostBotMessage(botID ID, text string, pictureURL *string) error {
+func (c *Client) PostBotMessage(ctx context.Context, botID ID, text string, pictureURL *string) error {
 	URL := fmt.Sprintf(c.endpointBase + postBotMessageEndpoint)
 
 	var data = struct {
@@ -101,24 +80,18 @@ func (c *Client) PostBotMessage(botID ID, text string, pictureURL *string) error
 		return err
 	}
 
-	return c.do(httpReq, nil)
+	return c.do(ctx, httpReq, nil)
 }
 
-// Index
-
-/*
-IndexBots -
-
-List bots that you have created
-*/
-func (c *Client) IndexBots() ([]*Bot, error) {
+// IndexBots - list bots that you have created
+func (c *Client) IndexBots(ctx context.Context) ([]*Bot, error) {
 	httpReq, err := http.NewRequest("GET", c.endpointBase+indexBotsEndpoint, nil)
 	if err != nil {
 		return nil, err
 	}
 
 	var resp []*Bot
-	err = c.doWithAuthToken(httpReq, &resp)
+	err = c.doWithAuthToken(ctx, httpReq, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -126,17 +99,8 @@ func (c *Client) IndexBots() ([]*Bot, error) {
 	return resp, nil
 }
 
-// Destroy
-
-/*
-DestroyBot -
-
-Remove a bot that you have created
-
-Parameters:
-	botID - required, ID(string)
-*/
-func (c *Client) DestroyBot(botID ID) error {
+// DestroyBot - Remove a bot that you have created
+func (c *Client) DestroyBot(ctx context.Context, botID ID) error {
 	URL := fmt.Sprintf(c.endpointBase + destroyBotEndpoint)
 
 	var data = struct {
@@ -155,5 +119,5 @@ func (c *Client) DestroyBot(botID ID) error {
 		return err
 	}
 
-	return c.doWithAuthToken(httpReq, nil)
+	return c.doWithAuthToken(ctx, httpReq, nil)
 }

@@ -1,13 +1,15 @@
+// Package groupme defines a client capable of executing API commands for the GroupMe chat service
 package groupme
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 )
 
 // GroupMe documentation: https://dev.groupme.com/docs/v3#likes
 
-////////// Endpoints //////////
+/*//////// Endpoints ////////*/
 const (
 	// Used to build other endpoints
 	likesEndpointRoot = "/messages/%s/%s"
@@ -16,20 +18,12 @@ const (
 	destroyLikeEndpoint = likesEndpointRoot + "/unlike" // POST
 )
 
-////////// API Requests /////////
+/*//////// API Requests ////////*/
 
 // Create
 
-/*
-CreateLike -
-
-Like a message.
-
-Parameters:
-	conversationID - required, ID(string)
-	messageID - required, ID(string)
-*/
-func (c *Client) CreateLike(conversationID, messageID ID) error {
+// CreateLike - Like a message.
+func (c *Client) CreateLike(ctx context.Context, conversationID, messageID ID) error {
 	url := fmt.Sprintf(c.endpointBase+createLikeEndpoint, conversationID, messageID)
 
 	httpReq, err := http.NewRequest("POST", url, nil)
@@ -37,21 +31,11 @@ func (c *Client) CreateLike(conversationID, messageID ID) error {
 		return err
 	}
 
-	return c.doWithAuthToken(httpReq, nil)
+	return c.doWithAuthToken(ctx, httpReq, nil)
 }
 
-// Destroy
-
-/*
-DestroyLike -
-
-Unlike a message.
-
-Parameters:
-	conversationID - required, ID(string)
-	messageID - required, ID(string)
-*/
-func (c *Client) DestroyLike(conversationID, messageID ID) error {
+// DestroyLike - Unlike a message.
+func (c *Client) DestroyLike(ctx context.Context, conversationID, messageID ID) error {
 	url := fmt.Sprintf(c.endpointBase+destroyLikeEndpoint, conversationID, messageID)
 
 	httpReq, err := http.NewRequest("POST", url, nil)
@@ -59,5 +43,5 @@ func (c *Client) DestroyLike(conversationID, messageID ID) error {
 		return err
 	}
 
-	return c.doWithAuthToken(httpReq, nil)
+	return c.doWithAuthToken(ctx, httpReq, nil)
 }

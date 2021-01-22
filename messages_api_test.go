@@ -1,6 +1,8 @@
+// Package groupme defines a client capable of executing API commands for the GroupMe chat service
 package groupme
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"testing"
@@ -18,6 +20,7 @@ func (s *MessagesAPISuite) SetupSuite() {
 
 func (s *MessagesAPISuite) TestMessagesIndex() {
 	resp, err := s.client.IndexMessages(
+		context.Background(),
 		ID("123"),
 		&IndexMessagesQuery{
 			BeforeID: "0123456789",
@@ -35,6 +38,7 @@ func (s *MessagesAPISuite) TestMessagesIndex() {
 
 func (s *MessagesAPISuite) TestMessagesCreate() {
 	message, err := s.client.CreateMessage(
+		context.Background(),
 		ID("123"),
 		&Message{
 			Text: "Test",
@@ -49,6 +53,7 @@ func TestMessagesAPISuite(t *testing.T) {
 	suite.Run(t, new(MessagesAPISuite))
 }
 
+// nolint // not duplicate code
 func messagesTestRouter() *mux.Router {
 	router := mux.NewRouter().Queries("token", "").Subrouter()
 

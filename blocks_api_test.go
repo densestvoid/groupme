@@ -1,6 +1,8 @@
+// Package groupme defines a client capable of executing API commands for the GroupMe chat service
 package groupme
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"testing"
@@ -17,7 +19,7 @@ func (s *BlocksAPISuite) SetupSuite() {
 }
 
 func (s *BlocksAPISuite) TestBlocksIndex() {
-	blocks, err := s.client.IndexBlock("1")
+	blocks, err := s.client.IndexBlock(context.Background(), "1")
 	s.Require().NoError(err)
 	s.Require().NotZero(blocks)
 	for _, block := range blocks {
@@ -26,19 +28,19 @@ func (s *BlocksAPISuite) TestBlocksIndex() {
 }
 
 func (s *BlocksAPISuite) TestBlocksBetween() {
-	between, err := s.client.BlockBetween("1", "2")
+	between, err := s.client.BlockBetween(context.Background(), "1", "2")
 	s.Require().NoError(err)
 	s.Assert().True(between)
 }
 
 func (s *BlocksAPISuite) TestBlocksCreate() {
-	block, err := s.client.CreateBlock("1", "2")
+	block, err := s.client.CreateBlock(context.Background(), "1", "2")
 	s.Require().NoError(err)
 	s.Assert().NotZero(block)
 }
 
 func (s *BlocksAPISuite) TestBlocksUnblock() {
-	s.Assert().NoError(s.client.Unblock("1", "2"))
+	s.Assert().NoError(s.client.Unblock(context.Background(), "1", "2"))
 }
 
 func TestBlocksAPISuite(t *testing.T) {

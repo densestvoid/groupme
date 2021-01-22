@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/densestvoid/groupme"
@@ -16,5 +17,5 @@ const botID = "0123456789ABCDEF"
 func main() {
 	// Create a new client with your auth token
 	client := groupme.NewClient("")
-	fmt.Println(client.PostBotMessage(botID, "Your message here!", nil))
+	fmt.Println(client.PostBotMessage(context.Background(), botID, "Your message here!", nil))
 }

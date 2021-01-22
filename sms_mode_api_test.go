@@ -1,6 +1,8 @@
+// Package groupme defines a client capable of executing API commands for the GroupMe chat service
 package groupme
 
 import (
+	"context"
 	"net/http"
 	"testing"
 
@@ -16,16 +18,17 @@ func (s *SMSModeAPISuite) SetupSuite() {
 }
 
 func (s *SMSModeAPISuite) TestSMSModeCreate() {
-	s.Assert().NoError(s.client.CreateSMSMode(10, nil))
+	s.Assert().NoError(s.client.CreateSMSMode(context.Background(), 10, nil))
 }
 
 func (s *SMSModeAPISuite) TestSMSModeDelete() {
-	s.Assert().NoError(s.client.DeleteSMSMode())
+	s.Assert().NoError(s.client.DeleteSMSMode(context.Background()))
 }
 func TestSMSModeAPISuite(t *testing.T) {
 	suite.Run(t, new(SMSModeAPISuite))
 }
 
+// nolint // not duplicate code
 func smsModeTestRouter() *mux.Router {
 	router := mux.NewRouter().Queries("token", "").Subrouter()
 

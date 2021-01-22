@@ -1,12 +1,14 @@
+// Package groupme defines a client capable of executing API commands for the GroupMe chat service
 package groupme
 
 import (
+	"context"
 	"net/http"
 )
 
 // GroupMe documentation: https://dev.groupme.com/docs/v3#blocks
 
-////////// Endpoints //////////
+/*//////// Endpoints ////////*/
 const (
 	// Used to build other endpoints
 	blocksEndpointRoot = "/blocks"
@@ -18,19 +20,10 @@ const (
 	unblockEndpoint      = blocksEndpointRoot              // DELETE
 )
 
-////////// API Requests //////////
+/*//////// API Requests ////////*/
 
-// Index
-
-/*
-IndexBlock -
-
-A list of contacts you have blocked. These people cannot DM you
-
-Parameters:
-	userID - required, ID(string)
-*/
-func (c *Client) IndexBlock(userID ID) ([]*Block, error) {
+// IndexBlock - A list of contacts you have blocked. These people cannot DM you
+func (c *Client) IndexBlock(ctx context.Context, userID string) ([]*Block, error) {
 	httpReq, err := http.NewRequest("GET", c.endpointBase+indexBlocksEndpoint, nil)
 	if err != nil {
 		return nil, err
@@ -38,13 +31,13 @@ func (c *Client) IndexBlock(userID ID) ([]*Block, error) {
 
 	URL := httpReq.URL
 	query := URL.Query()
-	query.Set("user", userID.String())
+	query.Set("user", userID)
 	URL.RawQuery = query.Encode()
 
 	var resp struct {
 		Blocks []*Block `json:"blocks"`
 	}
-	err = c.doWithAuthToken(httpReq, &resp)
+	err = c.doWithAuthToken(ctx, httpReq, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -52,17 +45,8 @@ func (c *Client) IndexBlock(userID ID) ([]*Block, error) {
 	return resp.Blocks, nil
 }
 
-// Between
-
-/*
-BlockBetween -
-
-Asks if a block exists between you and another user id
-
-Parameters:
-	otherUserID - required, ID(string)
-*/
-func (c *Client) BlockBetween(userID, otherUserID ID) (bool, error) {
+// BlockBetween - Asks if a block exists between you and another user id
+func (c *Client) BlockBetween(ctx context.Context, userID, otherUserID string) (bool, error) {
 	httpReq, err := http.NewRequest("GET", c.endpointBase+blockBetweenEndpoint, nil)
 	if err != nil {
 		return false, err
@@ -70,14 +54,14 @@ func (c *Client) BlockBetween(userID, otherUserID ID) (bool, error) {
 
 	URL := httpReq.URL
 	query := URL.Query()
-	query.Set("user", userID.String())
-	query.Set("otherUser", otherUserID.String())
+	query.Set("user", userID)
+	query.Set("otherUser", otherUserID)
 	URL.RawQuery = query.Encode()
 
 	var resp struct {
 		Between bool `json:"between"`
 	}
-	err = c.doWithAuthToken(httpReq, &resp)
+	err = c.doWithAuthToken(ctx, httpReq, &resp)
 	if err != nil {
 		return false, err
 	}
@@ -85,18 +69,8 @@ func (c *Client) BlockBetween(userID, otherUserID ID) (bool, error) {
 	return resp.Between, nil
 }
 
-// Create
-
-/*
-CreateBlock -
-
-Creates a block between you and the contact
-
-Parameters:
-	userID - required, ID(string)
-	otherUserID - required, ID(string)
-*/
-func (c *Client) CreateBlock(userID, otherUserID ID) (*Block, error) {
+// CreateBlock - Creates a block between you and the contact
+func (c *Client) CreateBlock(ctx context.Context, userID, otherUserID string) (*Block, error) {
 	httpReq, err := http.NewRequest("POST", c.endpointBase+createBlockEndpoint, nil)
 	if err != nil {
 		return nil, err
@@ -104,14 +78,14 @@ func (c *Client) CreateBlock(userID, otherUserID ID) (*Block, error) {
 
 	URL := httpReq.URL
 	query := URL.Query()
-	query.Set("user", userID.String())
-	query.Set("otherUser", otherUserID.String())
+	query.Set("user", userID)
+	query.Set("otherUser", otherUserID)
 	URL.RawQuery = query.Encode()
 
 	var resp struct {
 		Block *Block `json:"block"`
 	}
-	err = c.doWithAuthToken(httpReq, &resp)
+	err = c.doWithAuthToken(ctx, httpReq, &resp)
 	if err != nil {
 		return nil, err
 	}
@@ -119,18 +93,8 @@ func (c *Client) CreateBlock(userID, otherUserID ID) (*Block, error) {
 	return resp.Block, nil
 }
 
-// Unblock
-
-/*
-Unblock -
-
-Removes block between you and other user
-
-Parameters:
-	userID - required, ID(string)
-	otherUserID - required, ID(string)
-*/
-func (c *Client) Unblock(userID, otherUserID ID) error {
+// Unblock - Removes block between you and other user
+func (c *Client) Unblock(ctx context.Context, userID, otherUserID string) error {
 	httpReq, err := http.NewRequest("DELETE", c.endpointBase+unblockEndpoint, nil)
 	if err != nil {
 		return err
@@ -138,11 +102,11 @@ func (c *Client) Unblock(userID, otherUserID ID) error {
 
 	URL := httpReq.URL
 	query := URL.Query()
-	query.Set("user", userID.String())
-	query.Set("otherUser", otherUserID.String())
+	query.Set("user", userID)
+	query.Set("otherUser", otherUserID)
 	URL.RawQuery = query.Encode()
 
-	err = c.doWithAuthToken(httpReq, nil)
+	err = c.doWithAuthToken(ctx, httpReq, nil)
 	if err != nil {
 		return err
 	}

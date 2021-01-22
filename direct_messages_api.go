@@ -1,7 +1,9 @@
+// Package groupme defines a client capable of executing API commands for the GroupMe chat service
 package groupme
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -11,7 +13,7 @@ import (
 
 // GroupMe documentation: https://dev.groupme.com/docs/v3#direct_messages
 
-////////// Endpoints //////////
+/*//////// Endpoints ////////*/
 const (
 	// Used to build other endpoints
 	directMessagesEndpointRoot = "/direct_messages"
@@ -21,11 +23,9 @@ const (
 	createDirectMessageEndpoint = directMessagesEndpointRoot // POST
 )
 
-////////// API Requests //////////
+/*//////// API Requests ////////*/
 
-// Index
-
-// MessagesQuery defines the optional URL parameters for IndexDirectMessages
+// IndexDirectMessagesQuery defines the optional URL parameters for IndexDirectMessages
 type IndexDirectMessagesQuery struct {
 	// Returns 20 messages created before the given message ID
 	BeforeID ID `json:"before_id"`
@@ -66,14 +66,14 @@ Parameters:
 	otherUserID - required, ID(string); the other participant in the conversation.
 	See IndexDirectMessagesQuery
 */
-func (c *Client) IndexDirectMessages(otherUserID ID, req *IndexDirectMessagesQuery) (IndexDirectMessagesResponse, error) {
+func (c *Client) IndexDirectMessages(ctx context.Context, otherUserID string, req *IndexDirectMessagesQuery) (IndexDirectMessagesResponse, error) {
 	httpReq, err := http.NewRequest("GET", c.endpointBase+indexDirectMessagesEndpoint, nil)
 	if err != nil {
 		return IndexDirectMessagesResponse{}, err
 	}
 
 	query := httpReq.URL.Query()
-	query.Set("other_user_id", otherUserID.String())
+	query.Set("other_user_id", otherUserID)
 	if req != nil {
 		if req.BeforeID != "" {
 			query.Add("before_ID", req.BeforeID.String())
@@ -84,7 +84,7 @@ func (c *Client) IndexDirectMessages(otherUserID ID, req *IndexDirectMessagesQue
 	}
 
 	var resp IndexDirectMessagesResponse
-	err = c.doWithAuthToken(httpReq, &resp)
+	err = c.doWithAuthToken(ctx, httpReq, &resp)
 	if err != nil {
 		return IndexDirectMessagesResponse{}, err
 	}
@@ -92,12 +92,8 @@ func (c *Client) IndexDirectMessages(otherUserID ID, req *IndexDirectMessagesQue
 	return resp, nil
 }
 
-// Create
-
 /*
-CreateDirectMessage -
-
-Send a DM to another user
+CreateDirectMessage - Send a DM to another user
 
 If you want to attach an image, you must first process it
 through our image service.
@@ -109,18 +105,8 @@ specify a replacement charmap to substitute emoji characters
 
 The character map is an array of arrays containing rune data
 ([[{pack_id,offset}],...]).
-
-Parameters:
-	See Message.
-		recipientID - required, ID(string); The GroupMe user ID of the recipient of this message.
-		text - required, string. Can be ommitted if at least one
-			attachment is present
-		attachments - a polymorphic list of attachments (locations,
-			images, etc). You may have You may have more than
-			one of any type of attachment, provided clients can
-			display it.
 */
-func (c *Client) CreateDirectMessage(m *Message) (*Message, error) {
+func (c *Client) CreateDirectMessage(ctx context.Context, m *Message) (*Message, error) {
 	URL := fmt.Sprintf(c.endpointBase + createDirectMessageEndpoint)
 
 	m.SourceGUID = uuid.New().String()
@@ -143,7 +129,7 @@ func (c *Client) CreateDirectMessage(m *Message) (*Message, error) {
 	var resp struct {
 		*Message `json:"message"`
 	}
-	err = c.doWithAuthToken(httpReq, &resp)
+	err = c.doWithAuthToken(ctx, httpReq, &resp)
 	if err != nil {
 		return nil, err
 	}

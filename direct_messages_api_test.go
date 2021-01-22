@@ -1,6 +1,8 @@
+// Package groupme defines a client capable of executing API commands for the GroupMe chat service
 package groupme
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"testing"
@@ -18,7 +20,8 @@ func (s *DirectMessagesAPISuite) SetupSuite() {
 
 func (s *DirectMessagesAPISuite) TestDirectMessagesIndex() {
 	resp, err := s.client.IndexDirectMessages(
-		ID("123"),
+		context.Background(),
+		"123",
 		&IndexDirectMessagesQuery{
 			BeforeID: "0123456789",
 			SinceID:  "9876543210",
@@ -33,6 +36,7 @@ func (s *DirectMessagesAPISuite) TestDirectMessagesIndex() {
 
 func (s *DirectMessagesAPISuite) TestDirectMessagesCreate() {
 	message, err := s.client.CreateDirectMessage(
+		context.Background(),
 		&Message{
 			RecipientID: ID("123"),
 			Text:        "Test",
@@ -47,6 +51,7 @@ func TestDirectMessagesAPISuite(t *testing.T) {
 	suite.Run(t, new(DirectMessagesAPISuite))
 }
 
+// nolint // not duplicate code
 func directMessagesTestRouter() *mux.Router {
 	router := mux.NewRouter().Queries("token", "").Subrouter()
 
