@@ -74,6 +74,9 @@ func main() {
 
 ### [*FUTURE*] CLI
 
+## Support
+You can join the [GroupMe support group](https://groupme.com/join_group/65686806/il1737tE) (you will need to provide a reason for joining), or the [Discord server](https://discord.gg/raAdxWuKTU).
+
 ## Contribute
 I find the hours I can spend developing personal projects decreasing every year, so I welcome any help I can get. Feel free to tackle any open issues, or if a feature request catches your eye, feel free to reach out to me and we can discuss adding it to the package. However, once version 1.0 is released, I don't foresee much work happening on this project unless the GroupMe API is updated.
 
