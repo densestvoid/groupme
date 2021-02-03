@@ -28,9 +28,9 @@ import (
 // into the GroupMe development website: https://dev.groupme.com/
 const authorizationToken = "0123456789ABCDEF"
 
-// A short program that gets the gets the first 5 groups
-// the user is part of, and then the first 10 messages of
-// the first group in that list
+// A short program that gets the first 5 groups the user
+// is part of, and then the first 10 messages of the first
+// group in that list
 func main() {
 	// Create a new client with your auth token
 	client := groupme.NewClient(authorizationToken)
