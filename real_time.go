@@ -47,29 +47,46 @@ type LikeEvent struct {
 	Message Message
 }
 
+type EventType = int
+
+const (
+	EventMessage EventType = iota
+	EventLike
+)
+
+type Handler interface {
+	HandleError(error)
+}
+type HandlerText interface {
+	HandleTextMessage(Message)
+}
+type HandlerLike interface {
+	HandleLike(Message)
+}
+
 //PushSubscription manages real time subscription
 type PushSubscription struct {
-	channel chan wray.Message
-	//Channel to return things
-	MessageChannel chan Message
-	LikeChannel    chan LikeEvent
-	fayeClient     *wray.FayeClient
+	channel    chan wray.Message
+	fayeClient *wray.FayeClient
+	handlers   []Handler
 }
 
 //NewPushSubscription creates and returns a push subscription object
 func NewPushSubscription(context context.Context) PushSubscription {
 
 	r := PushSubscription{
-		channel:        make(chan wray.Message),
-		MessageChannel: make(chan Message),
-		LikeChannel:    make(chan LikeEvent),
+		channel: make(chan wray.Message),
 	}
 
 	return r
 }
 
+func (r *PushSubscription) AddHandler(h Handler) {
+	r.handlers = append(r.handlers, h)
+}
+
 //Listen connects to GroupMe. Runs in Goroutine.
-func (r *PushSubscription) Listen(context context.Context) {
+func (r *PushSubscription) StartListening(context context.Context) {
 	r.fayeClient = wray.NewFayeClient(pushServer)
 
 	r.fayeClient.SetLogger(fayeLogger{})
@@ -79,48 +96,55 @@ func (r *PushSubscription) Listen(context context.Context) {
 
 	go r.fayeClient.Listen()
 
-	for {
-		msg := <-r.channel
-		data := msg.Data()
-		content, _ := data["subject"]
-		contentType := data["type"].(string)
+	go func() {
+		for {
+			msg := <-r.channel
+			data := msg.Data()
+			content, _ := data["subject"]
+			contentType := data["type"].(string)
 
-		switch contentType {
-		case "line.create":
-			b, _ := json.Marshal(content)
+			switch contentType {
+			case "line.create":
+				b, _ := json.Marshal(content)
 
-			out := Message{}
-			json.Unmarshal(b, &out)
-			//fmt.Printf("%+v\n", out) //TODO
+				out := Message{}
+				json.Unmarshal(b, &out)
+				//fmt.Printf("%+v\n", out) //TODO
+				for _, h := range r.handlers {
+					if h, ok := h.(HandlerText); ok {
+						h.HandleTextMessage(out)
+					}
+				}
 
-			r.MessageChannel <- out
-			break
-		case "like.create":
-			b, _ := json.Marshal(content.(map[string]interface{})["line"])
-
-			out := Message{}
-			//log.Println(string(b))
-			err := json.Unmarshal(b, &out)
-			if err != nil {
-				log.Println(err)
-			}
-			outt := LikeEvent{Message: out}
-			//fmt.Printf("Like on %+v \n", outt.Message)
-
-			r.LikeChannel <- outt
-			break
-		case "ping":
-			break
-		default: //TODO: see if any other types are returned
-			if len(contentType) == 0 || content == nil {
 				break
+			case "like.create":
+				b, _ := json.Marshal(content.(map[string]interface{})["line"])
+
+				out := Message{}
+				//log.Println(string(b))
+				err := json.Unmarshal(b, &out)
+				if err != nil {
+					log.Println(err)
+				}
+				for _, h := range r.handlers {
+					if h, ok := h.(HandlerLike); ok {
+						h.HandleLike(out)
+					}
+				}
+				break
+			case "ping":
+				break
+			default: //TODO: see if any other types are returned
+				if len(contentType) == 0 || content == nil {
+					break
+				}
+				log.Println(contentType)
+				log.Fatalln(data)
+
 			}
-			log.Println(contentType)
-			log.Fatalln(data)
 
 		}
-
-	}
+	}()
 }
 
 //SubscribeToUser to users
