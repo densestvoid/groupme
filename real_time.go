@@ -63,6 +63,9 @@ type HandlerText interface {
 type HandlerLike interface {
 	HandleLike(Message)
 }
+type HandlerMembership interface {
+	HandleJoin(ID)
+}
 
 //PushSubscription manages real time subscription
 type PushSubscription struct {
@@ -104,12 +107,12 @@ func (r *PushSubscription) StartListening(context context.Context) {
 			contentType := data["type"].(string)
 
 			switch contentType {
-			case "line.create":
+			case "line.create", "direct_message.create":
 				b, _ := json.Marshal(content)
 
 				out := Message{}
 				json.Unmarshal(b, &out)
-				//fmt.Printf("%+v\n", out) //TODO
+				//fmt.Printf("%+v\n", out) //TODO logging
 				for _, h := range r.handlers {
 					if h, ok := h.(HandlerText); ok {
 						h.HandleTextMessage(out)
@@ -132,6 +135,17 @@ func (r *PushSubscription) StartListening(context context.Context) {
 					}
 				}
 				break
+			case "membership.create":
+				c, _ := content.(map[string]interface{})
+				id, _ := c["id"].(string)
+
+				for _, h := range r.handlers {
+					if h, ok := h.(HandlerMembership); ok {
+						h.HandleJoin(ID(id))
+					}
+				}
+
+				break
 			case "ping":
 				break
 			default: //TODO: see if any other types are returned
@@ -139,6 +153,8 @@ func (r *PushSubscription) StartListening(context context.Context) {
 					break
 				}
 				log.Println(contentType)
+				b, _ := json.Marshal(content)
+				log.Println(string(b))
 				log.Fatalln(data)
 
 			}
