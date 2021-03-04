@@ -2,7 +2,7 @@ module github.com/densestvoid/groupme
 
 go 1.15
 
-replace github.com/karmanyaahm/wray => ../wray
+//replace github.com/karmanyaahm/wray => ../wray
 
 require (
 	github.com/google/uuid v1.2.0
