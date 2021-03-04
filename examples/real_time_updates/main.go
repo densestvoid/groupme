@@ -3,13 +3,17 @@ package main
 import (
 	"context"
 	"fmt"
+	"os"
 
 	"github.com/densestvoid/groupme"
 )
 
 // This is not a real token. Please find yours by logging
 // into the GroupMe development website: https://dev.groupme.com/
-var authorizationToken = "ABCD"
+
+//var authorizationToken = "ABCD"
+
+var authorizationToken = "aa608b00a46401385ead62dd938575cf"
 
 // A short program that gets the gets the first 5 groups
 // the user is part of, and then the first 10 messages of
@@ -23,7 +27,7 @@ func main() {
 		context.Background(),
 		&groupme.GroupsQuery{
 			Page:    0,
-			PerPage: 5,
+			PerPage: 1,
 			Omit:    "memberships",
 		},
 	)
@@ -33,49 +37,79 @@ func main() {
 		return
 	}
 
-	// fmt.Println(groups)
-
 	// Get first 10 messages of the first group
 	if len(groups) == 0 {
 		fmt.Println("No groups")
+		os.Exit(1)
 	}
 
-	// messages, err := client.IndexMessages(context.Background(), groups[0].ID, &groupme.IndexMessagesQuery{
-	// 	Limit: 10,
-	// })
-
-	// if err != nil {
-	// 	fmt.Println(err)
-	// }
-
-	// fmt.Println(messages)
-	p := client.NewPushSubscription(context.Background())
-	go p.Listen(context.Background())
+	p := groupme.NewPushSubscription(context.Background())
+	go p.StartListening(context.TODO())
 
 	client = groupme.NewClient(authorizationToken)
 
-	a, _ := client.MyUser(context.Background())
+	User, _ := client.MyUser(context.Background())
+	p.SubscribeToUser(context.Background(), User.ID, authorizationToken)
 
-	p.SubscribeToUser(context.Background(), a.ID, authorizationToken)
-
-	authorizationToken = "BCDF"
-	client = groupme.NewClient(authorizationToken)
-	a, _ = client.MyUser(context.Background())
-
-	p.SubscribeToUser(context.Background(), a.ID, authorizationToken)
-
-	for {
-		select {
-		case msg := <-p.MessageChannel:
-			println(msg.Text)
-			break
-
-		case like := <-p.LikeChannel:
-			println("Liked")
-			println(like.Message.ID.String())
-			println(like.Message.Text)
-			break
-		}
+	for _, j := range groups {
+		p.SubscribeToGroup(context.TODO(), j.ID, authorizationToken)
 	}
 
+	p.AddFullHandler(Handler{User: User})
+
+	<-make(chan (struct{}))
+}
+
+type Handler struct {
+	User *groupme.User
+}
+
+func (h Handler) HandleError(e error) {
+	fmt.Println(e)
+}
+
+func (h Handler) HandleTextMessage(msg groupme.Message) {
+	fmt.Println(msg.Text, msg.Name)
+}
+
+func (h Handler) HandleJoin(group groupme.ID) {
+	fmt.Println("User joined group with id", group.String())
+}
+
+func (h Handler) HandleLike(id groupme.ID, by []string) {
+	fmt.Println(id.String(), "liked by", by)
+}
+
+func (h Handler) HandlerMembership(i groupme.ID) {
+	fmt.Println("Membership event on", i.String())
+}
+
+func (h Handler) HandleGroupTopic(group groupme.ID, newTopic string) {
+	fmt.Println(group.String(), "has new topic of", newTopic)
+}
+func (h Handler) HandleGroupName(group groupme.ID, newName string) {
+	fmt.Println(group.String(), "has new name of", newName)
+}
+func (h Handler) HandleGroupAvatar(group groupme.ID, newAvatar string) {
+	fmt.Println(group.String(), "has new avatar url of", newAvatar)
+}
+
+func (h Handler) HandleLikeIcon(group groupme.ID, PackID, PackIndex int, Type string) {
+	//Not sure how to use without groupme icon packs
+	if len(Type) == 0 {
+		fmt.Println("Default like icon set")
+		return
+	}
+	fmt.Println(group.String(), "has new like icon of", PackID, PackIndex, Type)
+}
+
+func (h Handler) HandleNewNickname(group groupme.ID, user groupme.ID, newName string) {
+	fmt.Printf("In group %s, user %s has new nickname %s\n", group.String(), user.String(), newName)
+}
+func (h Handler) HandleNewAvatarInGroup(group groupme.ID, user groupme.ID, avatarURL string) {
+	if avatarURL == "" {
+		//get default avatar
+		avatarURL = h.User.ImageURL
+	}
+	fmt.Printf("In group %s, user %s has new avatar with url %s\n", group.String(), user.String(), avatarURL)
 }
