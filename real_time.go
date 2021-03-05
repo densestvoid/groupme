@@ -77,6 +77,9 @@ type HandleGroupMetadata interface {
 type HandleGroupMembership interface {
 	HandleNewNickname(group ID, user ID, newName string)
 	HandleNewAvatarInGroup(group ID, user ID, avatarURL string)
+
+	//HandleNewMembers returns only partial member with id and nickname; added is false if removing
+	HandleMembers(group ID, members []Member, added bool)
 }
 
 //PushSubscription manages real time subscription
@@ -133,7 +136,10 @@ func (r *PushSubscription) StartListening(context context.Context) {
 			channel := msg.Channel()
 
 			if strings.HasPrefix(channel, groupChannel) || strings.HasPrefix(channel, dmChannel) {
-				r.chatEvent(contentType, content)
+				c := content.(map[string]interface{})["line"]
+				d, _ := json.Marshal(c)
+				r.chatEvent(contentType, d)
+				continue
 			}
 
 			switch contentType {
@@ -190,25 +196,19 @@ func (r *PushSubscription) StartListening(context context.Context) {
 	}()
 }
 
-func (r *PushSubscription) chatEvent(contentType string, content interface{}) {
+func (r *PushSubscription) chatEvent(contentType string, b []byte) {
 	switch contentType {
 	case "favorite":
-		b, ok := content.(map[string]interface{})["line"].(Message)
-
-		if !ok {
-			log.Println(content)
-		}
-
+		data := Message{}
+		_ = json.Unmarshal(b, &data)
 		for _, h := range r.handlers {
 			if h, ok := h.(HandlerLike); ok {
-				h.HandleLike(b.UserID, b.FavoritedBy)
+				h.HandleLike(data.ID, data.FavoritedBy)
 			}
 		}
 		break
 	default: //TODO: see if any other types are returned
-		println("HEHE")
 		log.Println(contentType)
-		b, _ := json.Marshal(content)
 		log.Fatalln(string(b))
 	}
 
@@ -247,6 +247,31 @@ func (r *PushSubscription) systemEvent(groupID ID, msg systemMessage) {
 				h.HandleNewAvatarInGroup(groupID, ID(strconv.Itoa(data.User.ID)), data.AvatarURL)
 			}
 		}
+		break
+	case "membership.announce.added":
+		data := struct {
+			Added []Member `json:"added_users"`
+		}{}
+		_ = json.Unmarshal(b, &data)
+		for _, h := range r.handlers {
+			if h, ok := h.(HandleGroupMembership); ok {
+				h.HandleMembers(groupID, data.Added, true)
+			}
+		}
+		break
+	case "membership.notifications.removed":
+		data := struct {
+			Added Member `json:"removed_user"`
+		}{}
+		_ = json.Unmarshal(b, &data)
+		for _, h := range r.handlers {
+			if h, ok := h.(HandleGroupMembership); ok {
+				h.HandleMembers(groupID, []Member{data.Added}, false)
+			}
+		}
+		break
+	case "group.role_change_admin":
+		//TODO
 		break
 	case "group.name_change":
 		data := struct {
@@ -306,6 +331,12 @@ func (r *PushSubscription) systemEvent(groupID ID, msg systemMessage) {
 				h.HandleLikeIcon(groupID, 0, 0, "")
 			}
 		}
+		break
+	case "group.type_change", "group.required_approval_enabled", "group.required_approval_disabled":
+		//TODO: group joining
+		break
+	case "group.shared", "group.unshared":
+		//TODO
 		break
 	default:
 		log.Println(kind)

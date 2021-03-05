@@ -69,7 +69,7 @@ func (h Handler) HandleError(e error) {
 }
 
 func (h Handler) HandleTextMessage(msg groupme.Message) {
-	fmt.Println(msg.Text, msg.Name)
+	fmt.Println(msg.Text, msg.Name, msg.Attachments)
 }
 
 func (h Handler) HandleJoin(group groupme.ID) {
@@ -112,4 +112,13 @@ func (h Handler) HandleNewAvatarInGroup(group groupme.ID, user groupme.ID, avata
 		avatarURL = h.User.ImageURL
 	}
 	fmt.Printf("In group %s, user %s has new avatar with url %s\n", group.String(), user.String(), avatarURL)
+}
+
+func (h Handler) HandleMembers(group groupme.ID, members []groupme.Member, added bool) {
+	action := "removed"
+	if added {
+		action = "added"
+	}
+
+	fmt.Printf("In group %s, users %v %s\n", group.String(), members, action)
 }
