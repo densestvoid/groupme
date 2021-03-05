@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/densestvoid/groupme"
@@ -49,10 +50,16 @@ func main() {
 	client = groupme.NewClient(authorizationToken)
 
 	User, _ := client.MyUser(context.Background())
-	p.SubscribeToUser(context.Background(), User.ID, authorizationToken)
+	err = p.SubscribeToUser(context.Background(), User.ID, authorizationToken)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	for _, j := range groups {
-		p.SubscribeToGroup(context.TODO(), j.ID, authorizationToken)
+		err = p.SubscribeToGroup(context.TODO(), j.ID, authorizationToken)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 
 	p.AddFullHandler(Handler{User: User})

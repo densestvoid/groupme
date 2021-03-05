@@ -19,8 +19,6 @@ const (
 	userChannel      = "/user/"
 	groupChannel     = "/group/"
 	dmChannel        = "/direct_message/"
-	handshakeChannel = "/meta/handshake"
-	connectChannel   = "/meta/connect"
 	subscribeChannel = "/meta/subscribe"
 )
 
@@ -131,7 +129,7 @@ func (r *PushSubscription) StartListening(context context.Context) {
 		for msg := range r.channel {
 			r.LastConnected = time.Now().Unix()
 			data := msg.Data()
-			content, _ := data["subject"]
+			content := data["subject"] //TODO ok
 			contentType := data["type"].(string)
 			channel := msg.Channel()
 
@@ -165,7 +163,6 @@ func (r *PushSubscription) StartListening(context context.Context) {
 					}
 				}
 
-				break
 			case "like.create":
 				//should be an associated chatEvent
 				break
@@ -179,7 +176,6 @@ func (r *PushSubscription) StartListening(context context.Context) {
 					}
 				}
 
-				break
 			case "ping":
 				break
 			default: //TODO: see if any other types are returned
@@ -206,7 +202,6 @@ func (r *PushSubscription) chatEvent(contentType string, b []byte) {
 				h.HandleLike(data.ID, data.FavoritedBy)
 			}
 		}
-		break
 	default: //TODO: see if any other types are returned
 		log.Println(contentType)
 		log.Fatalln(string(b))
@@ -232,7 +227,6 @@ func (r *PushSubscription) systemEvent(groupID ID, msg systemMessage) {
 				h.HandleNewNickname(groupID, ID(strconv.Itoa(data.User.ID)), data.Name)
 			}
 		}
-		break
 	case "membership.avatar_changed":
 		data := struct {
 			AvatarURL string `json:"avatar_url"`
@@ -247,7 +241,6 @@ func (r *PushSubscription) systemEvent(groupID ID, msg systemMessage) {
 				h.HandleNewAvatarInGroup(groupID, ID(strconv.Itoa(data.User.ID)), data.AvatarURL)
 			}
 		}
-		break
 	case "membership.announce.added":
 		data := struct {
 			Added []Member `json:"added_users"`
@@ -258,7 +251,6 @@ func (r *PushSubscription) systemEvent(groupID ID, msg systemMessage) {
 				h.HandleMembers(groupID, data.Added, true)
 			}
 		}
-		break
 	case "membership.notifications.removed":
 		data := struct {
 			Added Member `json:"removed_user"`
@@ -269,7 +261,6 @@ func (r *PushSubscription) systemEvent(groupID ID, msg systemMessage) {
 				h.HandleMembers(groupID, []Member{data.Added}, false)
 			}
 		}
-		break
 	case "group.role_change_admin":
 		//TODO
 		break
@@ -284,7 +275,6 @@ func (r *PushSubscription) systemEvent(groupID ID, msg systemMessage) {
 				h.HandleGroupName(groupID, data.Name)
 			}
 		}
-		break
 	case "group.topic_change":
 		data := struct {
 			Topic string
@@ -296,7 +286,6 @@ func (r *PushSubscription) systemEvent(groupID ID, msg systemMessage) {
 				h.HandleGroupTopic(groupID, data.Topic)
 			}
 		}
-		break
 	case "group.avatar_change":
 		data := struct {
 			AvatarURL string `json:"avatar_url"`
@@ -308,7 +297,6 @@ func (r *PushSubscription) systemEvent(groupID ID, msg systemMessage) {
 				h.HandleGroupAvatar(groupID, data.AvatarURL)
 			}
 		}
-		break
 	case "group.like_icon_set":
 		data := struct {
 			LikeIcon struct {
@@ -324,14 +312,12 @@ func (r *PushSubscription) systemEvent(groupID ID, msg systemMessage) {
 				h.HandleLikeIcon(groupID, data.LikeIcon.PackID, data.LikeIcon.PackIndex, data.LikeIcon.Type)
 			}
 		}
-		break
 	case "group.like_icon_removed":
 		for _, h := range r.handlers {
 			if h, ok := h.(HandleGroupMetadata); ok {
 				h.HandleLikeIcon(groupID, 0, 0, "")
 			}
 		}
-		break
 	case "group.type_change", "group.required_approval_enabled", "group.required_approval_disabled":
 		//TODO: group joining
 		break
