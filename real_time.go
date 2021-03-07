@@ -134,8 +134,17 @@ func (r *PushSubscription) StartListening(context context.Context) {
 			channel := msg.Channel()
 
 			if strings.HasPrefix(channel, groupChannel) || strings.HasPrefix(channel, dmChannel) {
-				c := content.(map[string]interface{})["line"]
-				d, _ := json.Marshal(c)
+				c, ok := content.(map[string]interface{})
+				if !ok {
+					fmt.Println(content, "err")
+					continue
+				}
+				e, ok := c["line"]
+				if !ok {
+					fmt.Println(content, "err")
+					continue
+				}
+				d, _ := json.Marshal(e)
 				r.chatEvent(contentType, d)
 				continue
 			}
