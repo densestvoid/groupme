@@ -82,6 +82,7 @@ func (c *Client) IndexDirectMessages(ctx context.Context, otherUserID string, re
 			query.Add("since_id", req.SinceID.String())
 		}
 	}
+	httpReq.URL.RawQuery = query.Encode()
 
 	var resp IndexDirectMessagesResponse
 	err = c.doWithAuthToken(ctx, httpReq, &resp)
@@ -127,7 +128,7 @@ func (c *Client) CreateDirectMessage(ctx context.Context, m *Message) (*Message,
 	}
 
 	var resp struct {
-		*Message `json:"message"`
+		*Message `json:"direct_message"`
 	}
 	err = c.doWithAuthToken(ctx, httpReq, &resp)
 	if err != nil {
