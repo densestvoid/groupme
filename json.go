@@ -100,19 +100,21 @@ func (m *Member) String() string {
 
 // Message is a GroupMe group message, returned in JSON API responses
 type Message struct {
-	ID             ID         `json:"id,omitempty"`
-	SourceGUID     string     `json:"source_guid,omitempty"`
-	CreatedAt      Timestamp  `json:"created_at,omitempty"`
-	GroupID        ID         `json:"group_id,omitempty"`
-	UserID         ID         `json:"user_id,omitempty"`
-	BotID          ID         `json:"bot_id,omitempty"`
-	SenderID       ID         `json:"sender_id,omitempty"`
-	SenderType     senderType `json:"sender_type,omitempty"`
-	System         bool       `json:"system,omitempty"`
-	Name           string     `json:"name,omitempty"`
-	RecipientID    ID         `json:"recipient_id,omitempty"`
-	ConversationID ID         `json:"conversation_id,omitempty"`
-	AvatarURL      string     `json:"avatar_url,omitempty"`
+	ID          ID         `json:"id,omitempty"`
+	SourceGUID  string     `json:"source_guid,omitempty"`
+	CreatedAt   Timestamp  `json:"created_at,omitempty"`
+	GroupID     ID         `json:"group_id,omitempty"`
+	UserID      ID         `json:"user_id,omitempty"`
+	BotID       ID         `json:"bot_id,omitempty"`
+	SenderID    ID         `json:"sender_id,omitempty"`
+	SenderType  senderType `json:"sender_type,omitempty"`
+	System      bool       `json:"system,omitempty"`
+	Name        string     `json:"name,omitempty"`
+	RecipientID ID         `json:"recipient_id,omitempty"`
+	//ChatID - over push ConversationID seems to be called ChatID
+	ChatID         ID     `json:"chat_id,omitempty"`
+	ConversationID ID     `json:"conversation_id,omitempty"`
+	AvatarURL      string `json:"avatar_url,omitempty"`
 	// Maximum length of 1000 characters
 	Text string `json:"text,omitempty"`
 	// Must be an image service URL (i.groupme.com)
