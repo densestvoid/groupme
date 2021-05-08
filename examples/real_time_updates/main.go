@@ -4,57 +4,97 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"os"
 
 	"github.com/densestvoid/groupme"
+	"github.com/karmanyaahm/wray"
 )
 
 // This is not a real token. Please find yours by logging
 // into the GroupMe development website: https://dev.groupme.com/
 
-//var authorizationToken = "ABCD"
+var authorizationToken = "ABCD"
 
-var authorizationToken = "aa608b00a46401385ead62dd938575cf"
+//This adapts your faye library to an interface compatible with this library
+type FayeClient struct {
+	*wray.FayeClient
+}
 
-// A short program that gets the gets the first 5 groups
-// the user is part of, and then the first 10 messages of
-// the first group in that list
+func (fc FayeClient) WaitSubscribe(channel string, msgChannel chan groupme.PushMessage) {
+	c_new := make(chan wray.Message)
+	fc.FayeClient.WaitSubscribe(channel, c_new)
+	//converting between types because channels don't support interfaces well
+	go func() {
+		for i := range c_new {
+			msgChannel <- i
+		}
+	}()
+}
+
+//for authentication, specific implementation will vary based on faye library
+type AuthExt struct{}
+
+func (a *AuthExt) In(wray.Message) {}
+func (a *AuthExt) Out(m wray.Message) {
+	groupme.OutMsgProc(m)
+}
+
+//specific to faye library
+type fayeLogger struct{}
+
+func (l fayeLogger) Infof(f string, a ...interface{}) {
+	log.Printf("[INFO]  : "+f, a...)
+}
+func (l fayeLogger) Errorf(f string, a ...interface{}) {
+	log.Printf("[ERROR] : "+f, a...)
+}
+func (l fayeLogger) Debugf(f string, a ...interface{}) {
+	log.Printf("[DEBUG] : "+f, a...)
+}
+func (l fayeLogger) Warnf(f string, a ...interface{}) {
+	log.Printf("[WARN]  : "+f, a...)
+}
+
+// A short program that subscribes to 2 groups and 2 direct chats
+// and prints out all recognized events in those
 func main() {
+
+	//Create and initialize fayeclient
+	fc := FayeClient{wray.NewFayeClient(groupme.PushServer)}
+	fc.SetLogger(fayeLogger{})
+	fc.AddExtension(&AuthExt{})
+	//for additional logging uncomment the following line
+	//fc.AddExtension(fc.FayeClient)
+
+	//create push subscription and start listening
+	p := groupme.NewPushSubscription(context.Background())
+	go p.StartListening(context.TODO(), fc)
+
 	// Create a new client with your auth token
 	client := groupme.NewClient(authorizationToken)
+	User, _ := client.MyUser(context.Background())
+	//Subscribe to get messages and events for the specific user
+	err := p.SubscribeToUser(context.Background(), User.ID, authorizationToken)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	//handles (in this case prints) all messages
+	p.AddFullHandler(Handler{User: User})
 
 	// Get the groups your user is part of
 	groups, err := client.IndexGroups(
 		context.Background(),
 		&groupme.GroupsQuery{
 			Page:    0,
-			PerPage: 1,
+			PerPage: 2,
 			Omit:    "memberships",
-		},
-	)
+		})
 
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-
-	// Get first 10 messages of the first group
-	if len(groups) == 0 {
-		fmt.Println("No groups")
-		os.Exit(1)
-	}
-
-	p := groupme.NewPushSubscription(context.Background())
-	go p.StartListening(context.TODO())
-
-	client = groupme.NewClient(authorizationToken)
-
-	User, _ := client.MyUser(context.Background())
-	err = p.SubscribeToUser(context.Background(), User.ID, authorizationToken)
-	if err != nil {
-		log.Fatal(err)
-	}
-
+	//Subscribe to those groups
 	for _, j := range groups {
 		err = p.SubscribeToGroup(context.TODO(), j.ID, authorizationToken)
 		if err != nil {
@@ -62,11 +102,25 @@ func main() {
 		}
 	}
 
-	p.AddFullHandler(Handler{User: User})
+	//get chats your user is part of
+	chats, err := client.IndexChats(context.Background(),
+		&groupme.IndexChatsQuery{
+			Page:    0,
+			PerPage: 2,
+		})
+	//subscribe to all those chats
+	for _, j := range chats {
+		err = p.SubscribeToDM(context.TODO(), j.LastMessage.ConversationID, authorizationToken)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
 
+	//blocking
 	<-make(chan (struct{}))
 }
 
+//Following example handlers print out all data
 type Handler struct {
 	User *groupme.User
 }
@@ -83,8 +137,8 @@ func (h Handler) HandleJoin(group groupme.ID) {
 	fmt.Println("User joined group with id", group.String())
 }
 
-func (h Handler) HandleLike(id groupme.ID, by []string) {
-	fmt.Println(id.String(), "liked by", by)
+func (h Handler) HandleLike(msg groupme.Message) {
+	fmt.Println(msg.ID, "liked by", msg.FavoritedBy)
 }
 
 func (h Handler) HandlerMembership(i groupme.ID) {
