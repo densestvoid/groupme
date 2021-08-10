@@ -125,7 +125,7 @@ func directMessagesTestRouter() *mux.Router {
 			w.WriteHeader(201)
 			fmt.Fprint(w, `{
 				"response": {
-					"message": {
+					"direct_message": {
 						"id": "1234567890",
 						"source_guid": "GUID",
 						"recipient_id": "20",
