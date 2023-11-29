@@ -81,7 +81,7 @@ func (c Client) do(ctx context.Context, req *http.Request, i interface{}) error 
 		if err != nil {
 			// We couldn't read the output.  Oh well; generate the appropriate error type anyway.
 			return &Meta{
-				Code: HTTPStatusCode(getResp.StatusCode),
+				Code: getResp.StatusCode,
 			}
 		}
 
@@ -89,7 +89,7 @@ func (c Client) do(ctx context.Context, req *http.Request, i interface{}) error 
 		if err = json.Unmarshal(readBytes, &resp); err != nil {
 			// We couldn't parse the output.  Oh well; generate the appropriate error type anyway.
 			return &Meta{
-				Code: HTTPStatusCode(getResp.StatusCode),
+				Code: getResp.StatusCode,
 			}
 		}
 		return &resp.Meta

@@ -9,8 +9,8 @@ import (
 // Meta is the error type returned in the GroupMe response.
 // Meant for clients that can't read HTTP status codes
 type Meta struct {
-	Code   HTTPStatusCode `json:"code,omitempty"`
-	Errors []string       `json:"errors,omitempty"`
+	Code   int      `json:"code,omitempty"`
+	Errors []string `json:"errors,omitempty"`
 }
 
 // Error returns the code and the error list as a string.

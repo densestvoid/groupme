@@ -2,6 +2,7 @@
 package groupme
 
 import (
+	"net/http"
 	"regexp"
 	"time"
 )
@@ -56,40 +57,20 @@ func (pn PhoneNumber) String() string {
 	return string(pn)
 }
 
-// HTTPStatusCode are returned by HTTP requests in
-// the header and the json "meta" field
-type HTTPStatusCode int
-
-// Text used as constant name
-const (
-	HTTPOk                  HTTPStatusCode = 200
-	HTTPCreated             HTTPStatusCode = 201
-	HTTPNoContent           HTTPStatusCode = 204
-	HTTPNotModified         HTTPStatusCode = 304
-	HTTPBadRequest          HTTPStatusCode = 400
-	HTTPUnauthorized        HTTPStatusCode = 401
-	HTTPForbidden           HTTPStatusCode = 403
-	HTTPNotFound            HTTPStatusCode = 404
-	HTTPEnhanceYourCalm     HTTPStatusCode = 420
-	HTTPInternalServerError HTTPStatusCode = 500
-	HTTPBadGateway          HTTPStatusCode = 502
-	HTTPServiceUnavailable  HTTPStatusCode = 503
-)
-
-// String returns the description of the status code according to GroupMe
-func (c HTTPStatusCode) String() string {
-	return map[HTTPStatusCode]string{
-		HTTPOk:                  "success",
-		HTTPCreated:             "resource was created successfully",
-		HTTPNoContent:           "resource was deleted successfully",
-		HTTPNotModified:         "no new data to return",
-		HTTPBadRequest:          "invalid format or data specified in the request",
-		HTTPUnauthorized:        "authentication credentials missing or incorrect",
-		HTTPForbidden:           "request refused due to update limits",
-		HTTPNotFound:            "URI is invalid or resource does not exist",
-		HTTPEnhanceYourCalm:     "application is being rate limited",
-		HTTPInternalServerError: "something unexpected occurred",
-		HTTPBadGateway:          "GroupMe is down or being upgraded",
-		HTTPServiceUnavailable:  "servers are overloaded, try again later",
-	}[c]
+// StatusText returns a text for the HTTP status code (according to GroupMe). It returns the empty string if the code is unknown.
+func HTTPStatusText(code int) string {
+	return map[int]string{
+		http.StatusOK:                  "Success!",                                                                                                                                                                   // OK
+		http.StatusCreated:             "Resource was created successfully.",                                                                                                                                         // Created
+		http.StatusNoContent:           "Resource was deleted successfully.",                                                                                                                                         // No Content
+		http.StatusNotModified:         "There was no new data to return.",                                                                                                                                           // Not Modified
+		http.StatusBadRequest:          "Returned when an invalid format or invalid data is specified in the request.",                                                                                               // Bad Request
+		http.StatusUnauthorized:        "Authentication credentials were missing or incorrect.",                                                                                                                      // Unauthorized
+		http.StatusForbidden:           "The request is understood, but it has been refused. An accompanying error message will explain why. This code is used when requests are being denied due to update limits.", // Forbidden
+		http.StatusNotFound:            "The URI requested is invalid or the resource requested, such as a user, does not exists.",                                                                                   // Not Found
+		420:                            "Returned when you are being rate limited. Chill the heck out.",                                                                                                              // Enhance Your Calm
+		http.StatusInternalServerError: "Something unexpected occurred. GroupMe will be notified.",                                                                                                                   // Internal Server Error
+		http.StatusBadGateway:          "GroupMe is down or being upgraded.",                                                                                                                                         // Bad Gateway
+		http.StatusServiceUnavailable:  "The GroupMe servers are up, but overloaded with requests. Try again later.",                                                                                                 // Service Unavailable
+	}[code]
 }
