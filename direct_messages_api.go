@@ -127,7 +127,7 @@ func (c *Client) CreateDirectMessage(ctx context.Context, m *Message) (*Message,
 	}
 
 	var resp struct {
-		*Message `json:"message"`
+		*Message `json:"direct_message"`
 	}
 	err = c.doWithAuthToken(ctx, httpReq, &resp)
 	if err != nil {
