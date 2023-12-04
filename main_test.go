@@ -1,4 +1,3 @@
-// Package groupme defines a client capable of executing API commands for the GroupMe chat service
 package groupme
 
 import (
@@ -10,7 +9,6 @@ import (
 	"strconv"
 	"sync"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/suite"
 )
@@ -29,7 +27,7 @@ type APISuite struct {
 }
 
 func (s *APISuite) setupSuite() {
-	s.addr = "localhost:" + s.generatePort()
+	s.addr = "localhost:" + GeneratePort()
 
 	s.client = NewClient("")
 	s.client.endpointBase = "http://" + s.addr
@@ -76,8 +74,7 @@ const (
 	portRange = portMax - portMin
 )
 
-func (s *APISuite) generatePort() string {
-	rand.Seed(time.Now().UnixNano())
+func GeneratePort() string {
 	// nolint // weak random generator is ok for creating port number in a test
 	return strconv.Itoa((rand.Intn(portRange) + portMin))
 }

@@ -1,4 +1,3 @@
-// Package groupme defines a client capable of executing API commands for the GroupMe chat service
 package groupme
 
 import (
@@ -31,6 +30,7 @@ MyUser -
 Loads a specific group.
 
 Parameters:
+
 	groupID - required, ID(string)
 */
 func (c *Client) MyUser(ctx context.Context) (*User, error) {
@@ -65,7 +65,7 @@ type UserSettings struct {
 /*
 UpdateMyUser -
 
-Update attributes about your own account
+# Update attributes about your own account
 
 Parameters: See UserSettings
 */

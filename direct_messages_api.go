@@ -1,4 +1,3 @@
-// Package groupme defines a client capable of executing API commands for the GroupMe chat service
 package groupme
 
 import (
@@ -63,6 +62,7 @@ Note that for historical reasons, likes are returned as an array
 of user ids in the favorited_by key.
 
 Parameters:
+
 	otherUserID - required, ID(string); the other participant in the conversation.
 	See IndexDirectMessagesQuery
 */

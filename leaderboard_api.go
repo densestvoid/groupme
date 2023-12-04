@@ -1,4 +1,3 @@
-// Package groupme defines a client capable of executing API commands for the GroupMe chat service
 package groupme
 
 import (
@@ -68,6 +67,7 @@ reverse chrono-order. Note that the payload includes a liked_at
 timestamp in ISO-8601 format.
 
 Parameters:
+
 	groupID - required, ID(string)
 */
 func (c *Client) MyLikesLeaderboard(ctx context.Context, groupID ID) ([]*Message, error) {
@@ -98,6 +98,7 @@ reverse chrono-order. Note that the payload includes a liked_at
 timestamp in ISO-8601 format.
 
 Parameters:
+
 	groupID - required, ID(string)
 */
 func (c *Client) MyHitsLeaderboard(ctx context.Context, groupID ID) ([]*Message, error) {

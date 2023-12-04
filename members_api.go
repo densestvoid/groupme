@@ -1,4 +1,3 @@
-// Package groupme defines a client capable of executing API commands for the GroupMe chat service
 package groupme
 
 import (
@@ -40,6 +39,7 @@ GUIDs can be added to the members parameters. These GUIDs will
 be reflected in the membership JSON objects.
 
 Parameters:
+
 	groupID - required, ID(string)
 	See Member.
 		Nickname - required
@@ -94,6 +94,7 @@ Keep in mind that results are temporary -- they will only be
 available for 1 hour after the add request.
 
 Parameters:
+
 	groupID - required, ID(string)
 	resultID - required, string
 */
@@ -127,6 +128,7 @@ Remove a member (or yourself) from a group.
 Note: The creator of the group cannot be removed or exit.
 
 Parameters:
+
 	groupID - required, ID(string)
 	membershipID - required, ID(string). Not the same as userID
 */

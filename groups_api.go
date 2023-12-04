@@ -1,4 +1,3 @@
-// Package groupme defines a client capable of executing API commands for the GroupMe chat service
 package groupme
 
 import (
@@ -146,6 +145,7 @@ ShowGroup -
 Loads a specific group.
 
 Parameters:
+
 	groupID - required, ID(string)
 */
 func (c *Client) ShowGroup(ctx context.Context, groupID ID) (*Group, error) {
@@ -170,7 +170,7 @@ func (c *Client) ShowGroup(ctx context.Context, groupID ID) (*Group, error) {
 /*
 CreateGroup -
 
-Create a new group
+# Create a new group
 
 Parameters: See GroupSettings
 */
@@ -201,9 +201,10 @@ func (c *Client) CreateGroup(ctx context.Context, gs GroupSettings) (*Group, err
 /*
 UpdateGroup -
 
-Update a group after creation
+# Update a group after creation
 
 Parameters:
+
 	groupID - required, ID(string)
 	See GroupSettings
 */
@@ -234,11 +235,12 @@ func (c *Client) UpdateGroup(ctx context.Context, groupID ID, gs GroupSettings) 
 /*
 DestroyGroup -
 
-Disband a group
+# Disband a group
 
-This action is only available to the group creator
+# This action is only available to the group creator
 
 Parameters:
+
 	groupID - required, ID(string)
 */
 func (c *Client) DestroyGroup(ctx context.Context, groupID ID) error {
@@ -257,9 +259,10 @@ func (c *Client) DestroyGroup(ctx context.Context, groupID ID) error {
 /*
 JoinGroup -
 
-Join a shared group
+# Join a shared group
 
 Parameters:
+
 	groupID - required, ID(string)
 	shareToken - required, string
 */
@@ -288,6 +291,7 @@ RejoinGroup -
 Rejoin a group. Only works if you previously removed yourself.
 
 Parameters:
+
 	groupID - required, ID(string)
 */
 func (c *Client) RejoinGroup(ctx context.Context, groupID ID) (*Group, error) {

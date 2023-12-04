@@ -1,4 +1,3 @@
-// Package groupme defines a client capable of executing API commands for the GroupMe chat service
 package groupme
 
 import (
@@ -31,6 +30,7 @@ Enables SMS mode for N hours, where N is at most 48. After N
 hours have elapsed, user will receive push notfications.
 
 Parameters:
+
 	duration - required, integer
 	registration_id - string; The push notification ID/token
 		that should be suppressed during SMS mode. If this is
