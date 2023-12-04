@@ -2,9 +2,9 @@ package groupme
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -12,22 +12,15 @@ import (
 )
 
 func TestServer(t *testing.T) {
-	addr := "localhost:" + GeneratePort()
-
 	var received bool
-	mux := http.NewServeMux()
-	mux.HandleFunc("/", HTTPHandlerFunc(func(m Message) { received = true }))
-	server := &http.Server{
-		Addr:    addr,
-		Handler: mux,
-	}
+	server := httptest.NewServer(HTTPHandlerFunc(func(m Message) { received = true }))
+	defer server.Close()
 
-	go server.ListenAndServe()
-	defer server.Shutdown(context.Background())
+	client := server.Client()
 
 	// Wait until server has started listening
 	// nolint // url is meant to be variable
-	for _, err := http.Get("http://" + addr); err != nil; _, err = http.Get("http://" + addr) {
+	for _, err := client.Get(server.URL); err != nil; _, err = client.Get(server.URL) {
 		continue
 	}
 
@@ -36,7 +29,7 @@ func TestServer(t *testing.T) {
 		msgBytes, err := json.Marshal(Message{})
 		require.NoError(t, err)
 
-		resp, err := http.DefaultClient.Post("http://"+addr, "application/json", bytes.NewReader(msgBytes))
+		resp, err := client.Post(server.URL, "application/json", bytes.NewReader(msgBytes))
 		require.NoError(t, err)
 
 		assert.Equal(t, http.StatusOK, resp.StatusCode)
@@ -48,7 +41,7 @@ func TestServer(t *testing.T) {
 		msgBytes, err := json.Marshal(Message{})
 		require.NoError(t, err)
 
-		resp, err := http.DefaultClient.Post("http://"+addr, "application/text", bytes.NewReader(msgBytes))
+		resp, err := client.Post(server.URL, "application/text", bytes.NewReader(msgBytes))
 		require.NoError(t, err)
 
 		assert.Equal(t, http.StatusUnsupportedMediaType, resp.StatusCode)
@@ -60,7 +53,7 @@ func TestServer(t *testing.T) {
 		msgBytes, err := json.Marshal(struct{ Bad string }{Bad: "bad"})
 		require.NoError(t, err)
 
-		resp, err := http.DefaultClient.Post("http://"+addr, "application/json", bytes.NewReader(msgBytes))
+		resp, err := client.Post(server.URL, "application/json", bytes.NewReader(msgBytes))
 		require.NoError(t, err)
 
 		assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
