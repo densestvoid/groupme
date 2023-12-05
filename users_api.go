@@ -34,7 +34,7 @@ Parameters:
 	groupID - required, ID(string)
 */
 func (c *Client) MyUser(ctx context.Context) (*User, error) {
-	URL := fmt.Sprintf(c.endpointBase + myUserEndpoint)
+	URL := fmt.Sprintf(c.apiEndpointBase + myUserEndpoint)
 
 	httpReq, err := http.NewRequest("GET", URL, nil)
 	if err != nil {
@@ -70,7 +70,7 @@ UpdateMyUser -
 Parameters: See UserSettings
 */
 func (c *Client) UpdateMyUser(ctx context.Context, us UserSettings) (*User, error) {
-	URL := fmt.Sprintf(c.endpointBase + updateMyUserEndpoint)
+	URL := fmt.Sprintf(c.apiEndpointBase + updateMyUserEndpoint)
 
 	jsonBytes, err := json.Marshal(&us)
 	if err != nil {

@@ -86,7 +86,7 @@ app for users who are participating in huge groups.
 Parameters: See GroupsQuery
 */
 func (c *Client) IndexGroups(ctx context.Context, req *GroupsQuery) ([]*Group, error) {
-	httpReq, err := http.NewRequest("GET", c.endpointBase+indexGroupsEndpoint, nil)
+	httpReq, err := http.NewRequest("GET", c.apiEndpointBase+indexGroupsEndpoint, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -123,7 +123,7 @@ FormerGroups -
 List they groups you have left but can rejoin.
 */
 func (c *Client) FormerGroups(ctx context.Context) ([]*Group, error) {
-	httpReq, err := http.NewRequest("GET", c.endpointBase+formerGroupsEndpoint, nil)
+	httpReq, err := http.NewRequest("GET", c.apiEndpointBase+formerGroupsEndpoint, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -149,7 +149,7 @@ Parameters:
 	groupID - required, ID(string)
 */
 func (c *Client) ShowGroup(ctx context.Context, groupID ID) (*Group, error) {
-	URL := fmt.Sprintf(c.endpointBase+showGroupEndpoint, groupID)
+	URL := fmt.Sprintf(c.apiEndpointBase+showGroupEndpoint, groupID)
 
 	httpReq, err := http.NewRequest("GET", URL, nil)
 	if err != nil {
@@ -175,7 +175,7 @@ CreateGroup -
 Parameters: See GroupSettings
 */
 func (c *Client) CreateGroup(ctx context.Context, gs GroupSettings) (*Group, error) {
-	URL := fmt.Sprintf(c.endpointBase + createGroupEndpoint)
+	URL := fmt.Sprintf(c.apiEndpointBase + createGroupEndpoint)
 
 	jsonBytes, err := json.Marshal(&gs)
 	if err != nil {
@@ -209,7 +209,7 @@ Parameters:
 	See GroupSettings
 */
 func (c *Client) UpdateGroup(ctx context.Context, groupID ID, gs GroupSettings) (*Group, error) {
-	URL := fmt.Sprintf(c.endpointBase+updateGroupEndpoint, groupID)
+	URL := fmt.Sprintf(c.apiEndpointBase+updateGroupEndpoint, groupID)
 
 	jsonBytes, err := json.Marshal(&gs)
 	if err != nil {
@@ -244,7 +244,7 @@ Parameters:
 	groupID - required, ID(string)
 */
 func (c *Client) DestroyGroup(ctx context.Context, groupID ID) error {
-	url := fmt.Sprintf(c.endpointBase+destroyGroupEndpoint, groupID)
+	url := fmt.Sprintf(c.apiEndpointBase+destroyGroupEndpoint, groupID)
 
 	httpReq, err := http.NewRequest("POST", url, nil)
 	if err != nil {
@@ -267,7 +267,7 @@ Parameters:
 	shareToken - required, string
 */
 func (c *Client) JoinGroup(ctx context.Context, groupID ID, shareToken string) (*Group, error) {
-	URL := fmt.Sprintf(c.endpointBase+joinGroupEndpoint, groupID, shareToken)
+	URL := fmt.Sprintf(c.apiEndpointBase+joinGroupEndpoint, groupID, shareToken)
 
 	httpReq, err := http.NewRequest("POST", URL, nil)
 	if err != nil {
@@ -295,7 +295,7 @@ Parameters:
 	groupID - required, ID(string)
 */
 func (c *Client) RejoinGroup(ctx context.Context, groupID ID) (*Group, error) {
-	URL := fmt.Sprintf(c.endpointBase + rejoinGroupEndpoint)
+	URL := fmt.Sprintf(c.apiEndpointBase + rejoinGroupEndpoint)
 
 	var data = struct {
 		GroupID ID `json:"group_id"`
@@ -335,7 +335,7 @@ the result of change owner action for the request
 Parameters: See ChangeOwnerRequest
 */
 func (c *Client) ChangeGroupOwner(ctx context.Context, reqs ChangeOwnerRequest) (ChangeOwnerResult, error) {
-	URL := fmt.Sprintf(c.endpointBase + changeGroupOwnerEndpoint)
+	URL := fmt.Sprintf(c.apiEndpointBase + changeGroupOwnerEndpoint)
 
 	var data = struct {
 		Requests []ChangeOwnerRequest `json:"requests"`

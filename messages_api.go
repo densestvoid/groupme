@@ -75,7 +75,7 @@ Note that for historical reasons, likes are returned as an
 array of user ids in the favorited_by key.
 */
 func (c *Client) IndexMessages(ctx context.Context, groupID ID, req *IndexMessagesQuery) (IndexMessagesResponse, error) {
-	url := fmt.Sprintf(c.endpointBase+indexMessagesEndpoint, groupID)
+	url := fmt.Sprintf(c.apiEndpointBase+indexMessagesEndpoint, groupID)
 	httpReq, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return IndexMessagesResponse{}, err
@@ -125,7 +125,7 @@ The character map is an array of arrays containing rune data
 The placeholder should be a high-point/invisible UTF-8 character.
 */
 func (c *Client) CreateMessage(ctx context.Context, groupID ID, m *Message) (*Message, error) {
-	URL := fmt.Sprintf(c.endpointBase+createMessagesEndpoint, groupID)
+	URL := fmt.Sprintf(c.apiEndpointBase+createMessagesEndpoint, groupID)
 
 	m.SourceGUID = uuid.New().String()
 	var data = struct {

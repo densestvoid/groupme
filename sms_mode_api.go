@@ -38,7 +38,7 @@ Parameters:
 		delivered to the device.
 */
 func (c *Client) CreateSMSMode(ctx context.Context, duration int, registrationID *ID) error {
-	URL := fmt.Sprintf(c.endpointBase + createSMSModeEndpoint)
+	URL := fmt.Sprintf(c.apiEndpointBase + createSMSModeEndpoint)
 
 	var data = struct {
 		Duration       int `json:"duration"`
@@ -74,7 +74,7 @@ DeleteSMSMode -
 Disables SMS mode
 */
 func (c *Client) DeleteSMSMode(ctx context.Context) error {
-	url := fmt.Sprintf(c.endpointBase + deleteSMSModeEndpoint)
+	url := fmt.Sprintf(c.apiEndpointBase + deleteSMSModeEndpoint)
 
 	httpReq, err := http.NewRequest("POST", url, nil)
 	if err != nil {

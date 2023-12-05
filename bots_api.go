@@ -27,7 +27,7 @@ const (
 // CreateBot - Create a bot. See the Bots Tutorial (https://dev.groupme.com/tutorials/bots)
 // for a full walkthrough.
 func (c *Client) CreateBot(ctx context.Context, bot *Bot) (*Bot, error) {
-	URL := c.endpointBase + createBotEndpoint
+	URL := c.apiEndpointBase + createBotEndpoint
 
 	var data = struct {
 		Bot *Bot `json:"bot,omitempty"`
@@ -57,7 +57,7 @@ func (c *Client) CreateBot(ctx context.Context, bot *Bot) (*Bot, error) {
 // PostBotMessage - Post a message from a bot
 // TODO: Move PostBotMessage to bot object, since it doesn't require access token
 func (c *Client) PostBotMessage(ctx context.Context, botID ID, text string, pictureURL *string) error {
-	URL := fmt.Sprintf(c.endpointBase + postBotMessageEndpoint)
+	URL := fmt.Sprintf(c.apiEndpointBase + postBotMessageEndpoint)
 
 	var data = struct {
 		BotID      ID      `json:"bot_id"`
@@ -84,7 +84,7 @@ func (c *Client) PostBotMessage(ctx context.Context, botID ID, text string, pict
 
 // IndexBots - list bots that you have created
 func (c *Client) IndexBots(ctx context.Context) ([]*Bot, error) {
-	httpReq, err := http.NewRequest("GET", c.endpointBase+indexBotsEndpoint, nil)
+	httpReq, err := http.NewRequest("GET", c.apiEndpointBase+indexBotsEndpoint, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -100,7 +100,7 @@ func (c *Client) IndexBots(ctx context.Context) ([]*Bot, error) {
 
 // DestroyBot - Remove a bot that you have created
 func (c *Client) DestroyBot(ctx context.Context, botID ID) error {
-	URL := fmt.Sprintf(c.endpointBase + destroyBotEndpoint)
+	URL := fmt.Sprintf(c.apiEndpointBase + destroyBotEndpoint)
 
 	var data = struct {
 		BotID ID `json:"bot_id"`

@@ -35,7 +35,7 @@ const (
 // IndexLeaderboard - A list of the liked messages in the group for a given period of
 // time. Messages are ranked in order of number of likes.
 func (c *Client) IndexLeaderboard(ctx context.Context, groupID ID, p period) ([]*Message, error) {
-	url := fmt.Sprintf(c.endpointBase+indexLeaderboardEndpoint, groupID)
+	url := fmt.Sprintf(c.apiEndpointBase+indexLeaderboardEndpoint, groupID)
 	httpReq, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err
@@ -71,7 +71,7 @@ Parameters:
 	groupID - required, ID(string)
 */
 func (c *Client) MyLikesLeaderboard(ctx context.Context, groupID ID) ([]*Message, error) {
-	url := fmt.Sprintf(c.endpointBase+myLikesLeaderboardEndpoint, groupID)
+	url := fmt.Sprintf(c.apiEndpointBase+myLikesLeaderboardEndpoint, groupID)
 	httpReq, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err
@@ -102,7 +102,7 @@ Parameters:
 	groupID - required, ID(string)
 */
 func (c *Client) MyHitsLeaderboard(ctx context.Context, groupID ID) ([]*Message, error) {
-	url := fmt.Sprintf(c.endpointBase+myHitsLeaderboardEndpoint, groupID)
+	url := fmt.Sprintf(c.apiEndpointBase+myHitsLeaderboardEndpoint, groupID)
 	httpReq, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err

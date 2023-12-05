@@ -27,7 +27,7 @@ type IndexChatsQuery struct {
 // IndexChats - Returns a paginated list of direct message chats, or
 // conversations, sorted by updated_at descending.
 func (c *Client) IndexChats(ctx context.Context, req *IndexChatsQuery) ([]*Chat, error) {
-	httpReq, err := http.NewRequest("GET", c.endpointBase+indexChatsEndpoint, nil)
+	httpReq, err := http.NewRequest("GET", c.apiEndpointBase+indexChatsEndpoint, nil)
 	if err != nil {
 		return nil, err
 	}

@@ -67,7 +67,7 @@ Parameters:
 	See IndexDirectMessagesQuery
 */
 func (c *Client) IndexDirectMessages(ctx context.Context, otherUserID string, req *IndexDirectMessagesQuery) (IndexDirectMessagesResponse, error) {
-	httpReq, err := http.NewRequest("GET", c.endpointBase+indexDirectMessagesEndpoint, nil)
+	httpReq, err := http.NewRequest("GET", c.apiEndpointBase+indexDirectMessagesEndpoint, nil)
 	if err != nil {
 		return IndexDirectMessagesResponse{}, err
 	}
@@ -107,7 +107,7 @@ The character map is an array of arrays containing rune data
 ([[{pack_id,offset}],...]).
 */
 func (c *Client) CreateDirectMessage(ctx context.Context, m *Message) (*Message, error) {
-	URL := fmt.Sprintf(c.endpointBase + createDirectMessageEndpoint)
+	URL := fmt.Sprintf(c.apiEndpointBase + createDirectMessageEndpoint)
 
 	m.SourceGUID = uuid.New().String()
 	var data = struct {

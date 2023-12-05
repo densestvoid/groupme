@@ -49,7 +49,7 @@ Parameters:
 			Email - string
 */
 func (c *Client) AddMembers(ctx context.Context, groupID ID, members ...*Member) (string, error) {
-	URL := fmt.Sprintf(c.endpointBase+addMembersEndpoint, groupID)
+	URL := fmt.Sprintf(c.apiEndpointBase+addMembersEndpoint, groupID)
 
 	var data = struct {
 		Members []*Member `json:"members"`
@@ -99,7 +99,7 @@ Parameters:
 	resultID - required, string
 */
 func (c *Client) AddMembersResults(ctx context.Context, groupID ID, resultID string) ([]*Member, error) {
-	URL := fmt.Sprintf(c.endpointBase+addMembersResultsEndpoint, groupID, resultID)
+	URL := fmt.Sprintf(c.apiEndpointBase+addMembersResultsEndpoint, groupID, resultID)
 
 	httpReq, err := http.NewRequest("GET", URL, nil)
 	if err != nil {
@@ -133,7 +133,7 @@ Parameters:
 	membershipID - required, ID(string). Not the same as userID
 */
 func (c *Client) RemoveMember(ctx context.Context, groupID, membershipID ID) error {
-	URL := fmt.Sprintf(c.endpointBase+removeMemberEndpoint, groupID, membershipID)
+	URL := fmt.Sprintf(c.apiEndpointBase+removeMemberEndpoint, groupID, membershipID)
 
 	httpReq, err := http.NewRequest("POST", URL, nil)
 	if err != nil {
@@ -152,7 +152,7 @@ Update your nickname in a group. The nickname must be
 between 1 and 50 characters.
 */
 func (c *Client) UpdateMember(ctx context.Context, groupID ID, nickname string) (*Member, error) {
-	URL := fmt.Sprintf(c.endpointBase+updateMemberEndpoint, groupID)
+	URL := fmt.Sprintf(c.apiEndpointBase+updateMemberEndpoint, groupID)
 
 	type Nickname struct {
 		Nickname string `json:"nickname"`

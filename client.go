@@ -11,12 +11,14 @@ import (
 // GroupMeAPIBase - Endpoints are added on to this to get the full URI.
 // Overridable for testing
 const GroupMeAPIBase = "https://api.groupme.com/v3"
+const GroupMeImageBase = "https://image.groupme.com"
 
 // Client communicates with the GroupMe API to perform actions
 // on the basic types, i.e. Listing, Creating, Destroying
 type Client struct {
 	httpClient         *http.Client
-	endpointBase       string
+	apiEndpointBase    string
+	imageEndpointBase  string
 	authorizationToken string
 }
 
@@ -25,7 +27,8 @@ func NewClient(authToken string) *Client {
 	return &Client{
 		// TODO: enable transport information passing in
 		httpClient:         &http.Client{},
-		endpointBase:       GroupMeAPIBase,
+		apiEndpointBase:    GroupMeAPIBase,
+		imageEndpointBase:  GroupMeImageBase,
 		authorizationToken: authToken,
 	}
 }

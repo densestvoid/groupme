@@ -24,7 +24,7 @@ func (s *ClientSuite) SetupTest() {
 	s.client = NewClient("")
 	s.Require().NotNil(s.client)
 
-	s.client.endpointBase = s.addr
+	s.client.apiEndpointBase = s.addr
 }
 
 func (s *ClientSuite) TestClient_Close() {

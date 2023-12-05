@@ -23,7 +23,7 @@ const (
 
 // IndexBlock - A list of contacts you have blocked. These people cannot DM you
 func (c *Client) IndexBlock(ctx context.Context, userID string) ([]*Block, error) {
-	httpReq, err := http.NewRequest("GET", c.endpointBase+indexBlocksEndpoint, nil)
+	httpReq, err := http.NewRequest("GET", c.apiEndpointBase+indexBlocksEndpoint, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +46,7 @@ func (c *Client) IndexBlock(ctx context.Context, userID string) ([]*Block, error
 
 // BlockBetween - Asks if a block exists between you and another user id
 func (c *Client) BlockBetween(ctx context.Context, userID, otherUserID string) (bool, error) {
-	httpReq, err := http.NewRequest("GET", c.endpointBase+blockBetweenEndpoint, nil)
+	httpReq, err := http.NewRequest("GET", c.apiEndpointBase+blockBetweenEndpoint, nil)
 	if err != nil {
 		return false, err
 	}
@@ -70,7 +70,7 @@ func (c *Client) BlockBetween(ctx context.Context, userID, otherUserID string) (
 
 // CreateBlock - Creates a block between you and the contact
 func (c *Client) CreateBlock(ctx context.Context, userID, otherUserID string) (*Block, error) {
-	httpReq, err := http.NewRequest("POST", c.endpointBase+createBlockEndpoint, nil)
+	httpReq, err := http.NewRequest("POST", c.apiEndpointBase+createBlockEndpoint, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -94,7 +94,7 @@ func (c *Client) CreateBlock(ctx context.Context, userID, otherUserID string) (*
 
 // Unblock - Removes block between you and other user
 func (c *Client) Unblock(ctx context.Context, userID, otherUserID string) error {
-	httpReq, err := http.NewRequest("DELETE", c.endpointBase+unblockEndpoint, nil)
+	httpReq, err := http.NewRequest("DELETE", c.apiEndpointBase+unblockEndpoint, nil)
 	if err != nil {
 		return err
 	}

@@ -23,7 +23,7 @@ const (
 
 // CreateLike - Like a message.
 func (c *Client) CreateLike(ctx context.Context, conversationID, messageID ID) error {
-	url := fmt.Sprintf(c.endpointBase+createLikeEndpoint, conversationID, messageID)
+	url := fmt.Sprintf(c.apiEndpointBase+createLikeEndpoint, conversationID, messageID)
 
 	httpReq, err := http.NewRequest("POST", url, nil)
 	if err != nil {
@@ -35,7 +35,7 @@ func (c *Client) CreateLike(ctx context.Context, conversationID, messageID ID) e
 
 // DestroyLike - Unlike a message.
 func (c *Client) DestroyLike(ctx context.Context, conversationID, messageID ID) error {
-	url := fmt.Sprintf(c.endpointBase+destroyLikeEndpoint, conversationID, messageID)
+	url := fmt.Sprintf(c.apiEndpointBase+destroyLikeEndpoint, conversationID, messageID)
 
 	httpReq, err := http.NewRequest("POST", url, nil)
 	if err != nil {

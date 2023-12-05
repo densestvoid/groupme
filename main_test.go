@@ -30,7 +30,7 @@ func (s *APISuite) setupSuite() {
 	s.addr = "localhost:" + GeneratePort()
 
 	s.client = NewClient("")
-	s.client.endpointBase = "http://" + s.addr
+	s.client.apiEndpointBase = "http://" + s.addr
 
 	s.server = s.startServer(s.addr, s.handler)
 }
