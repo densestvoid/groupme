@@ -4,7 +4,8 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"io/ioutil"
+	"io"
+	"log/slog"
 	"net/http"
 )
 
@@ -13,25 +14,99 @@ import (
 const GroupMeAPIBase = "https://api.groupme.com/v3"
 const GroupMeImageBase = "https://image.groupme.com"
 
+type logger struct {
+	*slog.Logger
+	requestToAttr  func(*http.Request) slog.Attr
+	responseToAttr func(*http.Response) slog.Attr
+}
+
+func requestToAttr(req *http.Request) slog.Attr {
+	return slog.Group(
+		"request",
+		"method", req.Method,
+		"url", req.URL.String(),
+	)
+}
+
+func responseToAttr(resp *http.Response) slog.Attr {
+	return slog.Group(
+		"response",
+		slog.Group(
+			"header",
+			"content-length", resp.Header.Get("Content-Length"),
+			"content-type", resp.Header.Get("Content-Type"),
+		),
+		slog.Group(
+			"request",
+			"method", resp.Request.Method,
+			"url", resp.Request.URL.String(),
+		),
+	)
+}
+
 // Client communicates with the GroupMe API to perform actions
 // on the basic types, i.e. Listing, Creating, Destroying
 type Client struct {
 	httpClient         *http.Client
+	logger             *logger
 	apiEndpointBase    string
 	imageEndpointBase  string
 	authorizationToken string
 }
 
 // NewClient creates a new GroupMe API Client
-func NewClient(authToken string) *Client {
-	return &Client{
-		// TODO: enable transport information passing in
-		httpClient:         &http.Client{},
+func NewClient(authToken string, options ...ClientOption) *Client {
+	client := &Client{
+		httpClient: &http.Client{},
+		logger: &logger{
+			Logger:         slog.New(new(noopSlogHandler)),
+			requestToAttr:  requestToAttr,
+			responseToAttr: responseToAttr,
+		},
 		apiEndpointBase:    GroupMeAPIBase,
 		imageEndpointBase:  GroupMeImageBase,
 		authorizationToken: authToken,
 	}
+
+	for _, option := range options {
+		option(client)
+	}
+
+	return client
 }
+
+type ClientOption func(client *Client)
+
+func WithHTTPClient(httpClient *http.Client) ClientOption {
+	return func(client *Client) {
+		client.httpClient = httpClient
+	}
+}
+
+func WithLogHander(handler slog.Handler) ClientOption {
+	return func(client *Client) {
+		client.logger.Logger = slog.New(handler)
+	}
+}
+
+func WithRequestToAttr(requestToValue func(*http.Request) slog.Attr) ClientOption {
+	return func(client *Client) {
+		client.logger.requestToAttr = requestToValue
+	}
+}
+
+func WithResponseToAttr(responseToValue func(*http.Response) slog.Attr) ClientOption {
+	return func(client *Client) {
+		client.logger.responseToAttr = responseToValue
+	}
+}
+
+type noopSlogHandler struct{}
+
+func (h *noopSlogHandler) Enabled(context.Context, slog.Level) bool  { return true }
+func (h *noopSlogHandler) Handle(context.Context, slog.Record) error { return nil }
+func (h *noopSlogHandler) WithAttrs(attra []slog.Attr) slog.Handler  { return h }
+func (h *noopSlogHandler) WithGroup(name string) slog.Handler        { return h }
 
 // Close safely shuts down the Client
 func (c *Client) Close() error {
@@ -70,44 +145,46 @@ func (c Client) do(ctx context.Context, req *http.Request, i interface{}) error 
 		req.Header.Set("Content-Type", "application/json")
 	}
 
-	getResp, err := c.httpClient.Do(req)
+	c.logger.Info("sending", c.logger.requestToAttr(req))
+	resp, err := c.httpClient.Do(req)
+	c.logger.Info("received response", c.logger.responseToAttr(resp))
 	if err != nil {
 		return err
 	}
-	defer getResp.Body.Close()
+	defer resp.Body.Close()
 
 	var readBytes []byte
 	// Check Status Code is 1XX or 2XX
-	if getResp.StatusCode >= errorStatusCodeMin {
-		readBytes, err = ioutil.ReadAll(getResp.Body)
+	if resp.StatusCode >= errorStatusCodeMin {
+		readBytes, err = io.ReadAll(resp.Body)
 		if err != nil {
 			// We couldn't read the output.  Oh well; generate the appropriate error type anyway.
 			return &Meta{
-				Code: getResp.StatusCode,
+				Code: resp.StatusCode,
 			}
 		}
 
-		resp := newJSONResponse(nil)
-		if err = json.Unmarshal(readBytes, &resp); err != nil {
+		jsonResp := newJSONResponse(nil)
+		if err = json.Unmarshal(readBytes, &jsonResp); err != nil {
 			// We couldn't parse the output.  Oh well; generate the appropriate error type anyway.
 			return &Meta{
-				Code: getResp.StatusCode,
+				Code: resp.StatusCode,
 			}
 		}
-		return &resp.Meta
+		return &jsonResp.Meta
 	}
 
 	if i == nil {
 		return nil
 	}
 
-	readBytes, err = ioutil.ReadAll(getResp.Body)
+	readBytes, err = io.ReadAll(resp.Body)
 	if err != nil {
 		return err
 	}
 
-	resp := newJSONResponse(i)
-	if err := json.Unmarshal(readBytes, &resp); err != nil {
+	jsonResp := newJSONResponse(i)
+	if err := json.Unmarshal(readBytes, &jsonResp); err != nil {
 		return err
 	}
 

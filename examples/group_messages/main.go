@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"fmt"
+	"log/slog"
+	"os"
 
 	"github.com/densestvoid/groupme"
 )
@@ -16,7 +18,10 @@ const authorizationToken = "0123456789ABCDEF"
 // the first group in that list
 func main() {
 	// Create a new client with your auth token
-	client := groupme.NewClient(authorizationToken)
+	client := groupme.NewClient(
+		authorizationToken,
+		groupme.WithLogHander(slog.NewJSONHandler(os.Stdout, nil)),
+	)
 
 	// Get the groups your user is part of
 	groups, err := client.IndexGroups(
