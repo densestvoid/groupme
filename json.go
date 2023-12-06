@@ -145,15 +145,18 @@ const (
 
 // Attachment is a GroupMe message attachment, returned in JSON API responses
 type Attachment struct {
-	Type        attachmentType `json:"type,omitempty"`
-	Loci        [][]int        `json:"loci,omitempty"`
-	UserIDs     []ID           `json:"user_ids,omitempty"`
-	URL         string         `json:"url,omitempty"`
-	Name        string         `json:"name,omitempty"`
-	Latitude    string         `json:"lat,omitempty"`
-	Longitude   string         `json:"lng,omitempty"`
-	Placeholder string         `json:"placeholder,omitempty"`
-	Charmap     [][]int        `json:"charmap,omitempty"`
+	Type            attachmentType `json:"type,omitempty"`
+	Loci            [][]int        `json:"loci,omitempty"`
+	UserIDs         []ID           `json:"user_ids,omitempty"`
+	URL             string         `json:"url,omitempty"`
+	FileID          string         `json:"file_id,omitempty"`
+	VideoPreviewURL string         `json:"preview_url,omitempty"`
+	Name            string         `json:"name,omitempty"`
+	Latitude        string         `json:"lat,omitempty"`
+	Longitude       string         `json:"lng,omitempty"`
+	Placeholder     string         `json:"placeholder,omitempty"`
+	Charmap         [][]int        `json:"charmap,omitempty"`
+	ReplyID         ID             `json:"reply_id,omitempty"`
 }
 
 func (a *Attachment) String() string {
