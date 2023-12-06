@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 )
 
@@ -23,13 +23,26 @@ type Client struct {
 }
 
 // NewClient creates a new GroupMe API Client
-func NewClient(authToken string) *Client {
-	return &Client{
-		// TODO: enable transport information passing in
+func NewClient(authToken string, options ...ClientOption) *Client {
+	client := &Client{
 		httpClient:         &http.Client{},
 		apiEndpointBase:    GroupMeAPIBase,
 		imageEndpointBase:  GroupMeImageBase,
 		authorizationToken: authToken,
+	}
+
+	for _, option := range options {
+		option(client)
+	}
+
+	return client
+}
+
+type ClientOption func(client *Client)
+
+func WithHTTPClient(httpClient *http.Client) ClientOption {
+	return func(client *Client) {
+		client.httpClient = httpClient
 	}
 }
 
@@ -70,44 +83,44 @@ func (c Client) do(ctx context.Context, req *http.Request, i interface{}) error 
 		req.Header.Set("Content-Type", "application/json")
 	}
 
-	getResp, err := c.httpClient.Do(req)
+	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return err
 	}
-	defer getResp.Body.Close()
+	defer resp.Body.Close()
 
 	var readBytes []byte
 	// Check Status Code is 1XX or 2XX
-	if getResp.StatusCode >= errorStatusCodeMin {
-		readBytes, err = ioutil.ReadAll(getResp.Body)
+	if resp.StatusCode >= errorStatusCodeMin {
+		readBytes, err = io.ReadAll(resp.Body)
 		if err != nil {
 			// We couldn't read the output.  Oh well; generate the appropriate error type anyway.
 			return &Meta{
-				Code: getResp.StatusCode,
+				Code: resp.StatusCode,
 			}
 		}
 
-		resp := newJSONResponse(nil)
-		if err = json.Unmarshal(readBytes, &resp); err != nil {
+		jsonResp := newJSONResponse(nil)
+		if err = json.Unmarshal(readBytes, &jsonResp); err != nil {
 			// We couldn't parse the output.  Oh well; generate the appropriate error type anyway.
 			return &Meta{
-				Code: getResp.StatusCode,
+				Code: resp.StatusCode,
 			}
 		}
-		return &resp.Meta
+		return &jsonResp.Meta
 	}
 
 	if i == nil {
 		return nil
 	}
 
-	readBytes, err = ioutil.ReadAll(getResp.Body)
+	readBytes, err = io.ReadAll(resp.Body)
 	if err != nil {
 		return err
 	}
 
-	resp := newJSONResponse(i)
-	if err := json.Unmarshal(readBytes, &resp); err != nil {
+	jsonResp := newJSONResponse(i)
+	if err := json.Unmarshal(readBytes, &jsonResp); err != nil {
 		return err
 	}
 

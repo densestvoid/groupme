@@ -38,6 +38,7 @@ func main() {
 	// Get first 10 messages of the first group
 	if len(groups) == 0 {
 		fmt.Println("No groups")
+		return
 	}
 
 	messages, err := client.IndexMessages(context.Background(), groups[0].ID, &groupme.IndexMessagesQuery{
@@ -46,6 +47,7 @@ func main() {
 
 	if err != nil {
 		fmt.Println(err)
+		return
 	}
 
 	fmt.Println(messages)
