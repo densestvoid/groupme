@@ -20,13 +20,13 @@ func (m Meta) Error() string {
 
 // Group is a GroupMe group, returned in JSON API responses
 type Group struct {
-	ID   ID     `json:"id,omitempty"`
+	ID   string `json:"id,omitempty"`
 	Name string `json:"name,omitempty"`
 	// Type of group (private|public)
 	Type          string        `json:"type,omitempty"`
 	Description   string        `json:"description,omitempty"`
 	ImageURL      string        `json:"image_url,omitempty"`
-	CreatorUserID ID            `json:"creator_user_id,omitempty"`
+	CreatorUserID string        `json:"creator_user_id,omitempty"`
 	CreatedAt     Timestamp     `json:"created_at,omitempty"`
 	UpdatedAt     Timestamp     `json:"updated_at,omitempty"`
 	Members       []*Member     `json:"members,omitempty"`
@@ -37,7 +37,7 @@ type Group struct {
 // GroupMessages is a Group field, only returned in Group JSON API responses
 type GroupMessages struct {
 	Count                uint           `json:"count,omitempty"`
-	LastMessageID        ID             `json:"last_message_id,omitempty"`
+	LastMessageID        string         `json:"last_message_id,omitempty"`
 	LastMessageCreatedAt Timestamp      `json:"last_message_created_at,omitempty"`
 	Preview              MessagePreview `json:"preview,omitempty"`
 }
@@ -53,7 +53,7 @@ type MessagePreview struct {
 
 // GetMemberByUserID gets the group member by their UserID,
 // nil if no member matches
-func (g *Group) GetMemberByUserID(userID ID) *Member {
+func (g *Group) GetMemberByUserID(userID string) *Member {
 	for _, member := range g.Members {
 		if member.UserID == userID {
 			return member
@@ -81,8 +81,8 @@ func (g *Group) String() string {
 
 // Member is a GroupMe group member, returned in JSON API responses
 type Member struct {
-	ID           ID     `json:"id,omitempty"`
-	UserID       ID     `json:"user_id,omitempty"`
+	ID           string `json:"id,omitempty"`
+	UserID       string `json:"user_id,omitempty"`
 	Nickname     string `json:"nickname,omitempty"`
 	Muted        bool   `json:"muted,omitempty"`
 	ImageURL     string `json:"image_url,omitempty"`
@@ -99,18 +99,18 @@ func (m *Member) String() string {
 
 // Message is a GroupMe group message, returned in JSON API responses
 type Message struct {
-	ID             ID         `json:"id,omitempty"`
+	ID             string     `json:"id,omitempty"`
 	SourceGUID     string     `json:"source_guid,omitempty"`
 	CreatedAt      Timestamp  `json:"created_at,omitempty"`
-	GroupID        ID         `json:"group_id,omitempty"`
-	UserID         ID         `json:"user_id,omitempty"`
-	BotID          ID         `json:"bot_id,omitempty"`
-	SenderID       ID         `json:"sender_id,omitempty"`
+	GroupID        string     `json:"group_id,omitempty"`
+	UserID         string     `json:"user_id,omitempty"`
+	BotID          string     `json:"bot_id,omitempty"`
+	SenderID       string     `json:"sender_id,omitempty"`
 	SenderType     senderType `json:"sender_type,omitempty"`
 	System         bool       `json:"system,omitempty"`
 	Name           string     `json:"name,omitempty"`
-	RecipientID    ID         `json:"recipient_id,omitempty"`
-	ConversationID ID         `json:"conversation_id,omitempty"`
+	RecipientID    string     `json:"recipient_id,omitempty"`
+	ConversationID string     `json:"conversation_id,omitempty"`
 	AvatarURL      string     `json:"avatar_url,omitempty"`
 	// Maximum length of 1000 characters
 	Text string `json:"text,omitempty"`
@@ -147,7 +147,7 @@ const (
 type Attachment struct {
 	Type        attachmentType `json:"type,omitempty"`
 	Loci        [][]int        `json:"loci,omitempty"`
-	UserIDs     []ID           `json:"user_ids,omitempty"`
+	UserIDs     []string       `json:"user_ids,omitempty"`
 	URL         string         `json:"url,omitempty"`
 	Name        string         `json:"name,omitempty"`
 	Latitude    string         `json:"lat,omitempty"`
@@ -162,7 +162,7 @@ func (a *Attachment) String() string {
 
 // User is a GroupMe user, returned in JSON API responses
 type User struct {
-	ID          ID          `json:"id,omitempty"`
+	ID          string      `json:"id,omitempty"`
 	PhoneNumber PhoneNumber `json:"phone_number,omitempty"`
 	ImageURL    string      `json:"image_url,omitempty"`
 	Name        string      `json:"name,omitempty"`
@@ -193,8 +193,8 @@ func (c *Chat) String() string {
 
 // Bot is a GroupMe bot, it is connected to a specific group which it can send messages to
 type Bot struct {
-	BotID          ID     `json:"bot_id,omitempty"`
-	GroupID        ID     `json:"group_id,omitempty"`
+	BotID          string `json:"bot_id,omitempty"`
+	GroupID        string `json:"group_id,omitempty"`
 	Name           string `json:"name,omitempty"`
 	AvatarURL      string `json:"avatar_url,omitempty"`
 	CallbackURL    string `json:"callback_url,omitempty"`
@@ -207,8 +207,8 @@ func (b *Bot) String() string {
 
 // Block is a GroupMe block between two users, direct messages are not allowed
 type Block struct {
-	UserID        ID        `json:"user_id,omitempty"`
-	BlockedUserID ID        `json:"blocked_user_id,omitempty"`
+	UserID        string    `json:"user_id,omitempty"`
+	BlockedUserID string    `json:"blocked_user_id,omitempty"`
 	CreatedAT     Timestamp `json:"created_at,omitempty"`
 }
 

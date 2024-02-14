@@ -37,7 +37,7 @@ func (s *DirectMessagesAPISuite) TestDirectMessagesCreate() {
 	message, err := s.client.CreateDirectMessage(
 		context.Background(),
 		&Message{
-			RecipientID: ID("123"),
+			RecipientID: "123",
 			Text:        "Test",
 		},
 	)

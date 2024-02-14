@@ -12,13 +12,13 @@ type DataTypesSuite struct {
 }
 
 func (s *DataTypesSuite) TestID_Valid_True() {
-	var id ID = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-	s.Assert().True(id.Valid())
+	var id string = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	s.Assert().True(ValidID(id))
 }
 
 func (s *DataTypesSuite) TestID_Valid_False() {
-	var id ID = "`~!@#$%^&*()_-+={[}]:;\"'<,>.?/|\\"
-	s.Assert().False(id.Valid())
+	var id string = "`~!@#$%^&*()_-+={[}]:;\"'<,>.?/|\\"
+	s.Assert().False(ValidID(id))
 }
 
 func (s *DataTypesSuite) TestTimestamp_FromTime() {

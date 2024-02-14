@@ -31,7 +31,7 @@ Loads a specific group.
 
 Parameters:
 
-	groupID - required, ID(string)
+	groupID - required, string
 */
 func (c *Client) MyUser(ctx context.Context) (*User, error) {
 	URL := fmt.Sprintf(c.apiEndpointBase + myUserEndpoint)

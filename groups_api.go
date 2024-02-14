@@ -146,9 +146,9 @@ Loads a specific group.
 
 Parameters:
 
-	groupID - required, ID(string)
+	groupID - required, string
 */
-func (c *Client) ShowGroup(ctx context.Context, groupID ID) (*Group, error) {
+func (c *Client) ShowGroup(ctx context.Context, groupID string) (*Group, error) {
 	URL := fmt.Sprintf(c.apiEndpointBase+showGroupEndpoint, groupID)
 
 	httpReq, err := http.NewRequest("GET", URL, nil)
@@ -205,10 +205,10 @@ UpdateGroup -
 
 Parameters:
 
-	groupID - required, ID(string)
+	groupID - required, string
 	See GroupSettings
 */
-func (c *Client) UpdateGroup(ctx context.Context, groupID ID, gs GroupSettings) (*Group, error) {
+func (c *Client) UpdateGroup(ctx context.Context, groupID string, gs GroupSettings) (*Group, error) {
 	URL := fmt.Sprintf(c.apiEndpointBase+updateGroupEndpoint, groupID)
 
 	jsonBytes, err := json.Marshal(&gs)
@@ -241,9 +241,9 @@ DestroyGroup -
 
 Parameters:
 
-	groupID - required, ID(string)
+	groupID - required, ßstring
 */
-func (c *Client) DestroyGroup(ctx context.Context, groupID ID) error {
+func (c *Client) DestroyGroup(ctx context.Context, groupID string) error {
 	url := fmt.Sprintf(c.apiEndpointBase+destroyGroupEndpoint, groupID)
 
 	httpReq, err := http.NewRequest("POST", url, nil)
@@ -263,10 +263,10 @@ JoinGroup -
 
 Parameters:
 
-	groupID - required, ID(string)
+	groupID - required, string
 	shareToken - required, string
 */
-func (c *Client) JoinGroup(ctx context.Context, groupID ID, shareToken string) (*Group, error) {
+func (c *Client) JoinGroup(ctx context.Context, groupID string, shareToken string) (*Group, error) {
 	URL := fmt.Sprintf(c.apiEndpointBase+joinGroupEndpoint, groupID, shareToken)
 
 	httpReq, err := http.NewRequest("POST", URL, nil)
@@ -292,13 +292,13 @@ Rejoin a group. Only works if you previously removed yourself.
 
 Parameters:
 
-	groupID - required, ID(string)
+	groupID - required, string
 */
-func (c *Client) RejoinGroup(ctx context.Context, groupID ID) (*Group, error) {
+func (c *Client) RejoinGroup(ctx context.Context, groupID string) (*Group, error) {
 	URL := fmt.Sprintf(c.apiEndpointBase + rejoinGroupEndpoint)
 
 	var data = struct {
-		GroupID ID `json:"group_id"`
+		GroupID string `json:"group_id"`
 	}{
 		groupID,
 	}

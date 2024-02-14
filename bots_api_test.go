@@ -10,11 +10,16 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-type BotsAPISuite struct{ APISuite }
+type BotsAPISuite struct {
+	APISuite
+	botClient *BotClient
+}
 
 func (s *BotsAPISuite) SetupSuite() {
 	s.handler = botsTestRouter()
 	s.setupSuite()
+	s.botClient = NewBotClient("bot-id")
+	s.botClient.apiEndpointBase = "http://" + s.addr
 }
 
 func (s *BotsAPISuite) TestBotsCreate() {
@@ -30,7 +35,7 @@ func (s *BotsAPISuite) TestBotsCreate() {
 }
 
 func (s *BotsAPISuite) TestBotsPostMessage() {
-	err := s.client.PostBotMessage(context.Background(), "1", "test message", nil)
+	err := s.botClient.PostBotMessage(context.Background(), "test message", nil)
 	s.Require().NoError(err)
 }
 

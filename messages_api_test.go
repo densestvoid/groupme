@@ -20,7 +20,7 @@ func (s *MessagesAPISuite) SetupSuite() {
 func (s *MessagesAPISuite) TestMessagesIndex() {
 	resp, err := s.client.IndexMessages(
 		context.Background(),
-		ID("123"),
+		"123",
 		&IndexMessagesQuery{
 			BeforeID: "0123456789",
 			SinceID:  "9876543210",
@@ -38,7 +38,7 @@ func (s *MessagesAPISuite) TestMessagesIndex() {
 func (s *MessagesAPISuite) TestMessagesCreate() {
 	message, err := s.client.CreateMessage(
 		context.Background(),
-		ID("123"),
+		"123",
 		&Message{
 			Text: "Test",
 		},

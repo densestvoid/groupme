@@ -25,11 +25,11 @@ const (
 // IndexMessagesQuery defines the optional URL parameters for IndexMessages
 type IndexMessagesQuery struct {
 	// Returns messages created before the given message ID
-	BeforeID ID
+	BeforeID string
 	// Returns most recent messages created after the given message ID
-	SinceID ID
+	SinceID string
 	// Returns messages created immediately after the given message ID
-	AfterID ID
+	AfterID string
 	// Number of messages returned. Default is 20. Max is 100.
 	Limit int
 }
@@ -74,7 +74,7 @@ we return code 304.
 Note that for historical reasons, likes are returned as an
 array of user ids in the favorited_by key.
 */
-func (c *Client) IndexMessages(ctx context.Context, groupID ID, req *IndexMessagesQuery) (IndexMessagesResponse, error) {
+func (c *Client) IndexMessages(ctx context.Context, groupID string, req *IndexMessagesQuery) (IndexMessagesResponse, error) {
 	url := fmt.Sprintf(c.apiEndpointBase+indexMessagesEndpoint, groupID)
 	httpReq, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -85,13 +85,13 @@ func (c *Client) IndexMessages(ctx context.Context, groupID ID, req *IndexMessag
 	query := URL.Query()
 	if req != nil {
 		if req.BeforeID != "" {
-			query.Add("before_id", req.BeforeID.String())
+			query.Add("before_id", req.BeforeID)
 		}
 		if req.SinceID != "" {
-			query.Add("since_id", req.SinceID.String())
+			query.Add("since_id", req.SinceID)
 		}
 		if req.AfterID != "" {
-			query.Add("after_id", req.AfterID.String())
+			query.Add("after_id", req.AfterID)
 		}
 		if req.Limit != 0 {
 			query.Add("limit", strconv.Itoa(req.Limit))
@@ -124,7 +124,7 @@ The character map is an array of arrays containing rune data
 
 The placeholder should be a high-point/invisible UTF-8 character.
 */
-func (c *Client) CreateMessage(ctx context.Context, groupID ID, m *Message) (*Message, error) {
+func (c *Client) CreateMessage(ctx context.Context, groupID string, m *Message) (*Message, error) {
 	URL := fmt.Sprintf(c.apiEndpointBase+createMessagesEndpoint, groupID)
 
 	m.SourceGUID = uuid.New().String()

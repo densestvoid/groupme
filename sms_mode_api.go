@@ -37,12 +37,12 @@ Parameters:
 		omitted, both SMS and push notifications will be
 		delivered to the device.
 */
-func (c *Client) CreateSMSMode(ctx context.Context, duration int, registrationID *ID) error {
+func (c *Client) CreateSMSMode(ctx context.Context, duration int, registrationID *string) error {
 	URL := fmt.Sprintf(c.apiEndpointBase + createSMSModeEndpoint)
 
 	var data = struct {
-		Duration       int `json:"duration"`
-		RegistrationID *ID `json:"registration_id,omitempty"`
+		Duration       int     `json:"duration"`
+		RegistrationID *string `json:"registration_id,omitempty"`
 	}{
 		duration,
 		registrationID,

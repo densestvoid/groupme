@@ -27,9 +27,9 @@ const (
 // IndexDirectMessagesQuery defines the optional URL parameters for IndexDirectMessages
 type IndexDirectMessagesQuery struct {
 	// Returns 20 messages created before the given message ID
-	BeforeID ID `json:"before_id"`
+	BeforeID string `json:"before_id"`
 	// Returns 20 messages created after the given message ID
-	SinceID ID `json:"since_id"`
+	SinceID string `json:"since_id"`
 }
 
 func (q IndexDirectMessagesQuery) String() string {
@@ -63,7 +63,7 @@ of user ids in the favorited_by key.
 
 Parameters:
 
-	otherUserID - required, ID(string); the other participant in the conversation.
+	otherUserID - required, string; the other participant in the conversation.
 	See IndexDirectMessagesQuery
 */
 func (c *Client) IndexDirectMessages(ctx context.Context, otherUserID string, req *IndexDirectMessagesQuery) (IndexDirectMessagesResponse, error) {
@@ -76,10 +76,10 @@ func (c *Client) IndexDirectMessages(ctx context.Context, otherUserID string, re
 	query.Set("other_user_id", otherUserID)
 	if req != nil {
 		if req.BeforeID != "" {
-			query.Add("before_ID", req.BeforeID.String())
+			query.Add("before_ID", req.BeforeID)
 		}
 		if req.SinceID != "" {
-			query.Add("since_id", req.SinceID.String())
+			query.Add("since_id", req.SinceID)
 		}
 	}
 

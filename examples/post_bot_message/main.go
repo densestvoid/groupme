@@ -16,6 +16,6 @@ const botID = "0123456789ABCDEF"
 // the first group in that list
 func main() {
 	// Create a new client with your auth token
-	client := groupme.NewClient("")
-	fmt.Println(client.PostBotMessage(context.Background(), botID, "Your message here!", nil))
+	client := groupme.NewBotClient(botID)
+	fmt.Println(client.PostBotMessage(context.Background(), "Your message here!", nil))
 }

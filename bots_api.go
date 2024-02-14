@@ -54,34 +54,6 @@ func (c *Client) CreateBot(ctx context.Context, bot *Bot) (*Bot, error) {
 	return &resp, nil
 }
 
-// PostBotMessage - Post a message from a bot
-// TODO: Move PostBotMessage to bot object, since it doesn't require access token
-func (c *Client) PostBotMessage(ctx context.Context, botID ID, text string, pictureURL *string) error {
-	URL := fmt.Sprintf(c.apiEndpointBase + postBotMessageEndpoint)
-
-	var data = struct {
-		BotID      ID      `json:"bot_id"`
-		Text       string  `json:"text"`
-		PictureURL *string `json:",omitempty"`
-	}{
-		botID,
-		text,
-		pictureURL,
-	}
-
-	jsonBytes, err := json.Marshal(&data)
-	if err != nil {
-		return err
-	}
-
-	httpReq, err := http.NewRequest("POST", URL, bytes.NewBuffer(jsonBytes))
-	if err != nil {
-		return err
-	}
-
-	return c.do(ctx, httpReq, nil)
-}
-
 // IndexBots - list bots that you have created
 func (c *Client) IndexBots(ctx context.Context) ([]*Bot, error) {
 	httpReq, err := http.NewRequest("GET", c.apiEndpointBase+indexBotsEndpoint, nil)
@@ -99,11 +71,11 @@ func (c *Client) IndexBots(ctx context.Context) ([]*Bot, error) {
 }
 
 // DestroyBot - Remove a bot that you have created
-func (c *Client) DestroyBot(ctx context.Context, botID ID) error {
+func (c *Client) DestroyBot(ctx context.Context, botID string) error {
 	URL := fmt.Sprintf(c.apiEndpointBase + destroyBotEndpoint)
 
 	var data = struct {
-		BotID ID `json:"bot_id"`
+		BotID string `json:"bot_id"`
 	}{
 		botID,
 	}

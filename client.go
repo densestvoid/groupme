@@ -13,48 +13,26 @@ import (
 const GroupMeAPIBase = "https://api.groupme.com/v3"
 const GroupMeImageBase = "https://image.groupme.com"
 
-// Client communicates with the GroupMe API to perform actions
+// client communicates with the GroupMe API to perform actions
 // on the basic types, i.e. Listing, Creating, Destroying
-type Client struct {
-	httpClient         *http.Client
-	apiEndpointBase    string
-	imageEndpointBase  string
-	authorizationToken string
+type client struct {
+	httpClient        *http.Client
+	apiEndpointBase   string
+	imageEndpointBase string
 }
 
-// NewClient creates a new GroupMe API Client
-func NewClient(authToken string, options ...ClientOption) *Client {
-	client := &Client{
-		httpClient:         &http.Client{},
-		apiEndpointBase:    GroupMeAPIBase,
-		imageEndpointBase:  GroupMeImageBase,
-		authorizationToken: authToken,
-	}
-
-	for _, option := range options {
-		option(client)
-	}
-
-	return client
-}
-
-type ClientOption func(client *Client)
+type ClientOption func(client *client)
 
 func WithHTTPClient(httpClient *http.Client) ClientOption {
-	return func(client *Client) {
+	return func(client *client) {
 		client.httpClient = httpClient
 	}
 }
 
 // Close safely shuts down the Client
-func (c *Client) Close() error {
+func (c *client) Close() error {
 	c.httpClient.CloseIdleConnections()
 	return nil
-}
-
-// String returns a json formatted string
-func (c Client) String() string {
-	return marshal(&c)
 }
 
 /*/// Handle parsing of nested interface type response ///*/
@@ -77,7 +55,7 @@ func (r response) UnmarshalJSON(bs []byte) error {
 
 const errorStatusCodeMin = 300
 
-func (c Client) do(ctx context.Context, req *http.Request, i interface{}) error {
+func (c *client) do(ctx context.Context, req *http.Request, i interface{}) error {
 	req = req.WithContext(ctx)
 	if req.Method == "POST" {
 		req.Header.Set("Content-Type", "application/json")
@@ -125,13 +103,4 @@ func (c Client) do(ctx context.Context, req *http.Request, i interface{}) error 
 	}
 
 	return nil
-}
-
-func (c Client) doWithAuthToken(ctx context.Context, req *http.Request, i interface{}) error {
-	URL := req.URL
-	query := URL.Query()
-	query.Set("token", c.authorizationToken)
-	URL.RawQuery = query.Encode()
-
-	return c.do(ctx, req, i)
 }

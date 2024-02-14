@@ -8,19 +8,12 @@ import (
 
 // GroupMe documentation: https://dev.groupme.com/docs/responses
 
-// ID is an unordered alphanumeric string
-type ID string
-
 // Treated as a constant
 var alphaNumericRegex = regexp.MustCompile(`^[a-zA-Z0-9]+$`)
 
 // Valid checks if the ID string is alpha numeric
-func (id ID) Valid() bool {
+func ValidID(id string) bool {
 	return alphaNumericRegex.MatchString(string(id))
-}
-
-func (id ID) String() string {
-	return string(id)
 }
 
 // Timestamp is the number of seconds since the UNIX epoch
@@ -47,7 +40,7 @@ type PhoneNumber string
 // Treated as a constant
 var phoneNumberRegex = regexp.MustCompile(`^\+\d+ \d{10}$`)
 
-// Valid checks if the ID string is alpha numeric
+// Valid checks if the Phone Number string is numeric
 func (pn PhoneNumber) Valid() bool {
 	return phoneNumberRegex.MatchString(string(pn))
 }

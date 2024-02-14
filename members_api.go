@@ -40,15 +40,15 @@ be reflected in the membership JSON objects.
 
 Parameters:
 
-	groupID - required, ID(string)
+	groupID - required, string
 	See Member.
 		Nickname - required
 		One of the following identifiers must be used:
-			UserID - ID(string)
+			UserID - string
 			PhoneNumber - PhoneNumber(string)
 			Email - string
 */
-func (c *Client) AddMembers(ctx context.Context, groupID ID, members ...*Member) (string, error) {
+func (c *Client) AddMembers(ctx context.Context, groupID string, members ...*Member) (string, error) {
 	URL := fmt.Sprintf(c.apiEndpointBase+addMembersEndpoint, groupID)
 
 	var data = struct {
@@ -95,10 +95,10 @@ available for 1 hour after the add request.
 
 Parameters:
 
-	groupID - required, ID(string)
+	groupID - required, string
 	resultID - required, string
 */
-func (c *Client) AddMembersResults(ctx context.Context, groupID ID, resultID string) ([]*Member, error) {
+func (c *Client) AddMembersResults(ctx context.Context, groupID string, resultID string) ([]*Member, error) {
 	URL := fmt.Sprintf(c.apiEndpointBase+addMembersResultsEndpoint, groupID, resultID)
 
 	httpReq, err := http.NewRequest("GET", URL, nil)
@@ -129,10 +129,10 @@ Note: The creator of the group cannot be removed or exit.
 
 Parameters:
 
-	groupID - required, ID(string)
-	membershipID - required, ID(string). Not the same as userID
+	groupID - required, string
+	membershipID - required, string. Not the same as userID
 */
-func (c *Client) RemoveMember(ctx context.Context, groupID, membershipID ID) error {
+func (c *Client) RemoveMember(ctx context.Context, groupID, membershipID string) error {
 	URL := fmt.Sprintf(c.apiEndpointBase+removeMemberEndpoint, groupID, membershipID)
 
 	httpReq, err := http.NewRequest("POST", URL, nil)
@@ -151,7 +151,7 @@ UpdateMember -
 Update your nickname in a group. The nickname must be
 between 1 and 50 characters.
 */
-func (c *Client) UpdateMember(ctx context.Context, groupID ID, nickname string) (*Member, error) {
+func (c *Client) UpdateMember(ctx context.Context, groupID string, nickname string) (*Member, error) {
 	URL := fmt.Sprintf(c.apiEndpointBase+updateMemberEndpoint, groupID)
 
 	type Nickname struct {
